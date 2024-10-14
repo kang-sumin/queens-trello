@@ -32,6 +32,6 @@ public class BoardList {
     @JoinColumn(name="borad_id", nullable=false)
     private Board board;
 
-    @OneToMany(mappedBy = "boardlist")
+    @OneToMany(mappedBy = "boardList")
     private List<Card> cards = new ArrayList<>();
 }
