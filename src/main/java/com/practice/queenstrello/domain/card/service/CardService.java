@@ -24,6 +24,7 @@ public class CardService {
 
     @Transactional
     public CardSaveResponse saveCard(CardSaveRequest cardSaveRequest, long listId, Long creatorId) {
+        //카드생성자 확인
         User creator = userRepository.findById(creatorId).orElseThrow(()->new IllegalArgumentException("유효하지 않는 user id 입니다. "));
 
         //읽기전용이면 예외처리
@@ -38,10 +39,22 @@ public class CardService {
         cardRepository.save(card);
 
         //담당자 추가 (생성자 써서 CardMAnager 생성/저장)
-        List<User> mangers = userRepository.findAllById(cardSaveRequest.getManagerIds());
-        for (User manager : mangers){
-            CardManager cardManager = new CardManager(card,manager);
-            card.
+        List<User> managers = userRepository.findAllById(cardSaveRequest.getManagerIds());
+        for (User manager : managers) {
+            CardManager cardManager = new CardManager(card, manager);
+            card.addCardManager(cardManager);
+            cardManagerRepository.save(cardManager);
         }
+
+        // ID로 담당자 리스트 반환
+        List<Long> managerIds = managers.stream()
+                .map(User::getId)
+                .toList();
+
+        return new CardSaveResponse(card.getId(),
+                card.getTitle(),
+                card.getContent(),
+                card.getDeadLine(),
+                managerIds);
     }
 }
