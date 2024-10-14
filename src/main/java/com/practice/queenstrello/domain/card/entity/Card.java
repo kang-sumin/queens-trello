@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.card.entity;
 
 import com.practice.queenstrello.domain.comment.entity.Comment;
+import com.practice.queenstrello.domain.list.entity.BoardList;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,5 +37,18 @@ public class Card {
 
     @OneToMany(mappedBy = "card")
     private List<CardManager> cardManagers = new ArrayList<>();
+
+    //카드 생성자
+    public Card(String title, String content, LocalDateTime deadLine){
+        this.title=title;
+        this.content=content;
+        this.deadLine=deadLine;
+    }
+
+    //담당자 추가 메서드
+    public void addCardManager(CardManager cardManager){
+        this.cardManagers.add(cardManager);
+    }
+
 
 }
