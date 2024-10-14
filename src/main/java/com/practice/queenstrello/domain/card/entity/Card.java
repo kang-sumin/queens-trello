@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.card.entity;
 
 import com.practice.queenstrello.domain.comment.entity.Comment;
+import com.practice.queenstrello.domain.list.entity.BoardList;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,5 +37,9 @@ public class Card {
 
     @OneToMany(mappedBy = "card")
     private List<CardManager> cardManagers = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="list_id", nullable = false)
+    private BoardList boardList;
 
 }

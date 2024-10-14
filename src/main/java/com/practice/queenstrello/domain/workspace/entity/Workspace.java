@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.workspace.entity;
 
+import com.practice.queenstrello.domain.board.entity.Board;
 import com.practice.queenstrello.domain.common.entity.ModifiedTimestamped;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import jakarta.persistence.*;
@@ -25,11 +26,14 @@ public class Workspace extends ModifiedTimestamped{
     @Column(name="workspace_name", nullable=false, length=100)
     private String name;
 
-    @Column(name="password", nullable=false, length=500)
+    @Column(name="workspace_description", nullable=false, length=500)
     private String description;
 
     @OneToMany(mappedBy = "workspace")
     private List<WorkspaceMember> members = new ArrayList<>();
+
+    @OneToMany(mappedBy = "workspace")
+    private List<Board> boards = new ArrayList<>();
 
 
 }
