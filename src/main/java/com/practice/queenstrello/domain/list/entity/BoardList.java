@@ -1,10 +1,14 @@
 package com.practice.queenstrello.domain.list.entity;
 
 import com.practice.queenstrello.domain.board.entity.Board;
+import com.practice.queenstrello.domain.card.entity.Card;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,4 +31,7 @@ public class BoardList {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="borad_id", nullable=false)
     private Board board;
+
+    @OneToMany(mappedBy = "boardlist")
+    private List<Card> cards = new ArrayList<>();
 }

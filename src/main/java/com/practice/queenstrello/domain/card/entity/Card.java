@@ -38,6 +38,10 @@ public class Card {
     @OneToMany(mappedBy = "card")
     private List<CardManager> cardManagers = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="list_id", nullable = false)
+    private BoardList boardList;
+
     //카드 생성자
     public Card(String title, String content, LocalDateTime deadLine){
         this.title=title;

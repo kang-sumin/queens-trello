@@ -30,8 +30,8 @@ public class Board extends ModifiedTimestamped {
     @Column(name="board_background", length=200)
     private String backgroundColor;
 
-    @Column(name="board_image", length=200)
-    private String image;
+    @Column(name="board_image_url", length=200)
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="workspace_id", nullable=false)
