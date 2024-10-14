@@ -17,7 +17,7 @@ public class CardController {
     @PostMapping
     public ResponseEntity<CardSaveResponse> saveCard(@RequestBody CardSaveRequest cardSaveRequest, @PathVariable long listId, @RequestParam Long creatorId){
         CardSaveResponse cardSaveResponse = cardService.saveCard(cardSaveRequest,listId,creatorId);
-        return new ResponseEntity.ok(cardSaveResponse);
+        return ResponseEntity.ok(cardSaveResponse);
     }
 
 }
