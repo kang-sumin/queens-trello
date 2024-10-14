@@ -32,6 +32,4 @@ public class User extends CreatedTimestamped {
     private Boolean isDeleted;
 
 
-
-
 }
