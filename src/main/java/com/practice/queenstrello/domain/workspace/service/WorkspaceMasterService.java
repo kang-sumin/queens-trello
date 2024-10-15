@@ -3,6 +3,7 @@ package com.practice.queenstrello.domain.workspace.service;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
+import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.workspace.entity.MasterRequest;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceMasterRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,16 @@ public class WorkspaceMasterService {
 
         User requestUser = findUserByUserId(authUser.getId());
 
+        // 요청한 사용자의 권한이 USER인지 확인
+        if(!requestUser.getUserRole().equals(UserRole.ROLE_USER)) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_MASTER_REQUEST);
+        }
+
         MasterRequest newMasterRequest = new MasterRequest(
                 false,
                 requestUser
         );
-        MasterRequest savedMasterRequest = workspaceMasterRepository.save(newMasterRequest);
+        workspaceMasterRepository.save(newMasterRequest);
 
         return responseMessage;
     }

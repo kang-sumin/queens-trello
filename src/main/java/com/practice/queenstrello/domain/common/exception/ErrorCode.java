@@ -16,6 +16,7 @@ public enum ErrorCode {
 
 
     // Workspace Errorcode
+    HAS_NOT_ACCESS_PERMISSION_MASTER_REQUEST(HttpStatus.FORBIDDEN, "Master 변경 요청 권한이 없습니다."),
 
 
     // Board Errorcode
