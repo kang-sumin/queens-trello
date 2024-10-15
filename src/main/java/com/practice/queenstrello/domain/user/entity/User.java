@@ -35,4 +35,5 @@ public class User extends CreatedTimestamped {
     private String nickname;
 
 
+
 }
