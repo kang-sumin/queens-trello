@@ -27,7 +27,10 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
+        // 논리적 삭제 처리 (isDeleted를 true로 설정)
+        user.setIsDeleted(true);
+        // 사용자 정보를 업데이트
+        userRepository.save(user);
 
-
-    }
+}
 }
