@@ -31,6 +31,7 @@ public enum ErrorCode {
 
 
     // Search Errorcode
+    NOT_FOUND_NICKNAME(HttpStatus.NOT_FOUND, "해당 닉네임의 유저가 존재하지 않습니다."),
 
 
     // Notification Errorcode

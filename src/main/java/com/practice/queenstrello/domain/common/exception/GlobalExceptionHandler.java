@@ -20,6 +20,11 @@ public class GlobalExceptionHandler {
         return getErrorResponse(ex.getErrorCode().getStatus(), ex.getMessage());
     }
 
+    @ExceptionHandler(NoNicnameUserException.class)
+    public ResponseEntity<Map<String, Object>> handlePasswordMismatchException(NoNicnameUserException ex) {
+        return getErrorResponse(ex.getErrorCode().getStatus(), ex.getMessage());
+    }
+
     /**
      * @param status : 오류 상태 코드
      * @param message : 오류 메시지
