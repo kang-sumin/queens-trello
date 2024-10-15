@@ -4,9 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class ManagerResponse {
-    String managerNickname;
+    private Long managerId;
+    private String managerNickname;
 
-    public ManagerResponse(String managerNickname) {
+    public ManagerResponse(Long managerId, String managerNickname) {
+        this.managerId = managerId;
         this.managerNickname = managerNickname;
     }
 }

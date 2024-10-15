@@ -17,6 +17,6 @@ public class SearchResponse {
         this.title = title;
         this.content = content;
         this.deadLine = deadLine;
-        this.cardManagers = cardManagers.stream().map(manager->new ManagerResponse(manager.getManager().getNickname())).toList();
+        this.cardManagers = cardManagers.stream().map(manager->new ManagerResponse(manager.getManager().getId(), manager.getManager().getNickname())).toList();
     }
 }
