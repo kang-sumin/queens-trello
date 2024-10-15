@@ -19,6 +19,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handlePasswordMismatchException(QueensTrelloException ex) {
         return getErrorResponse(ex.getErrorCode().getStatus(), ex.getMessage());
     }
+    @ExceptionHandler(InvalidUserException.class)
+    public ResponseEntity<Map<String, Object>> handlePasswordMismatchException(InvalidUserException ex) {
+        return getErrorResponse(ex.getErrorCode().getStatus(), ex.getMessage());
+    }
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handlePasswordMismatchException(PasswordMismatchException ex) {
+        return getErrorResponse(ex.getErrorCode().getStatus(), ex.getMessage());
+    }
 
     /**
      * @param status : 오류 상태 코드

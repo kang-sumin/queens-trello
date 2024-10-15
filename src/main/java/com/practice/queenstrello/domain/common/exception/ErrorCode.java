@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     // User ErrorCode
-
+    INVALID_USER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
+    PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
 
     // Attachment ErrorCode
 

@@ -1,6 +1,9 @@
 package com.practice.queenstrello.domain.user.service;
 
 
+import com.practice.queenstrello.domain.common.exception.ErrorCode;
+import com.practice.queenstrello.domain.common.exception.InvalidUserException;
+import com.practice.queenstrello.domain.common.exception.PasswordMismatchException;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +23,11 @@ public class UserService {
     public void deleteUser(Long userId, String password) {
         // 사용자 정보 조회
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+                .orElseThrow(() -> new InvalidUserException(ErrorCode.INVALID_USER));
 
         // 비밀번호 확인
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new PasswordMismatchException(ErrorCode.PASSWORD_MISMATCH);
         }
 
         // 논리적 삭제 처리 (isDeleted를 true로 설정)
