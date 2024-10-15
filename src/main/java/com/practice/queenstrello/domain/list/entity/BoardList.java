@@ -34,4 +34,10 @@ public class BoardList {
 
     @OneToMany(mappedBy = "boardList")
     private List<Card> cards = new ArrayList<>();
+
+    //카드 추가 메서드
+    public void addCard(Card card){
+        this.cards.add(card);
+        card.setBoardList(this); //카드와 리스트 연결
+    }
 }
