@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.card.controller;
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.card.dto.request.CardSaveRequest;
 import com.practice.queenstrello.domain.card.dto.request.CardUpdateRequest;
 import com.practice.queenstrello.domain.card.dto.response.CardDetailResponse;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +25,8 @@ public class CardController {
 
     //카드 생성
     @PostMapping
-    public ResponseEntity<CardSaveResponse> saveCard(@RequestBody CardSaveRequest cardSaveRequest, @PathVariable long listId, @RequestParam Long creatorId){
+    public ResponseEntity<CardSaveResponse> saveCard(@RequestBody CardSaveRequest cardSaveRequest, @PathVariable long listId, @AuthenticationPrincipal AuthUser authUser){
+        Long creatorId = authUser.getUserId(); //AuthUser에서 userId 가져옴
         CardSaveResponse cardSaveResponse = cardService.saveCard(cardSaveRequest,listId,creatorId);
         return ResponseEntity.ok(cardSaveResponse);
     }
@@ -44,14 +47,16 @@ public class CardController {
 
     //카드 수정
     @PutMapping("/{cardId}")
-    public ResponseEntity<CardUpdateResponse> updateCard(@PathVariable Long cardId,@RequestBody CardUpdateRequest cardUpdateRequest, @RequestParam Long userId){
+    public ResponseEntity<CardUpdateResponse> updateCard(@PathVariable Long cardId,@RequestBody CardUpdateRequest cardUpdateRequest, @AuthenticationPrincipal AuthUser authUser){
+        Long userId = authUser.getUserId(); //AuthUser에서 userId 가져옴
         CardUpdateResponse updatedCard = cardService.updateCard(cardId,cardUpdateRequest,userId);
         return ResponseEntity.ok(updatedCard);
     }
 
     //카드 삭제
     @DeleteMapping("/{cardId}")
-    public ResponseEntity<Void> deleteCard(@PathVariable Long cardId,@PathVariable Long listId,@RequestParam Long userId){
+    public ResponseEntity<Void> deleteCard(@PathVariable Long cardId,@PathVariable Long listId,@AuthenticationPrincipal AuthUser authUser){
+        Long userId = authUser.getUserId(); //AuthUser에서 userId 가져옴
         cardService.deleteCard(cardId,userId);
         return ResponseEntity.noContent().build();
     }
