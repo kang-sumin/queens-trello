@@ -11,6 +11,7 @@ import com.practice.queenstrello.domain.card.entity.CardManager;
 import com.practice.queenstrello.domain.card.repository.CardManagerRepository;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.dto.response.CommentSaveResponse;
+import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
@@ -33,6 +34,7 @@ public class CardService {
     private final CardManagerRepository cardManagerRepository;
     private final UserRepository userRepository;
     private final BoardListRepository boardListRepository;
+    private final CommentRepository commentRepository;
 
     //카드 생성
     @Transactional
@@ -160,5 +162,22 @@ public class CardService {
                 card.getDeadLine(),
                 updatedManagerIds);
 
+    }
+
+    public void deleteCard(Long cardId, Long userId) {
+        //유저가 존재하는지 먼저 확인
+        User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("유효하지 않은 사용자 Id 입니다."));
+        //삭제하려는 카드 조회
+        Card card = cardRepository.findById(cardId).orElseThrow(()->new IllegalArgumentException("유효하지 않은 카드 Id 입니다."));
+        //읽기전용 사용자는 카드 삭제 불가
+        if (user.getUserRole().equals(UserRole.ROLE_USER)){
+            throw new IllegalStateException("읽기 전용 사용자는 카드를 삭제할 수 없습니다.");
+        }
+        //카드에 연결된 데이터(카드 매니저, 댓글..) 삭제
+        cardManagerRepository.deleteByCardId(cardId); //담당자 삭제
+        commentRepository.deleteByCardId(cardId); //댓글 삭제
+
+        //카드 삭제
+        cardRepository.delete(card);
     }
 }

@@ -49,6 +49,13 @@ public class CardController {
         return ResponseEntity.ok(updatedCard);
     }
 
+    //카드 삭제
+    @DeleteMapping("/{cardId}")
+    public ResponseEntity<Void> deleteCard(@PathVariable Long cardId,@PathVariable Long listId,@RequestParam Long userId){
+        cardService.deleteCard(cardId,userId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 
