@@ -1,6 +1,5 @@
 package com.practice.queenstrello.config;
 
-import com.practice.queenstrello.domain.auth.AuthUser;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
