@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.workspace.service;
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.workspace.dto.response.MasterRequestResponse;
 import com.practice.queenstrello.domain.workspace.entity.MasterRequest;
 import com.practice.queenstrello.domain.workspace.repository.MasterRequestRepository;
@@ -19,7 +20,7 @@ public class WorkspaceAdminService {
     public Page<MasterRequestResponse> getMasterRequests(int page, int size, AuthUser authUser) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        Page<MasterRequest> masterRequests = findMasterRequests()
+//        Page<MasterRequest> masterRequests = findMasterRequests()
 
         return null;
     }

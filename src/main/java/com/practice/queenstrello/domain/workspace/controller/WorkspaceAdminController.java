@@ -1,10 +1,12 @@
 package com.practice.queenstrello.domain.workspace.controller;
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.workspace.dto.response.MasterRequestResponse;
 import com.practice.queenstrello.domain.workspace.service.WorkspaceAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +24,8 @@ public class WorkspaceAdminController {
     public ResponseEntity<Page<MasterRequestResponse>> getMasterRequests(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            AuthUser authUser
-    ){
+            @AuthenticationPrincipal AuthUser authUser
+            ){
         return ResponseEntity.ok(workspaceAdminService.getMasterRequests(page, size, authUser));
     }
 

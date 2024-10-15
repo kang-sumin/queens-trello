@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MasterRequestRepository extends JpaRepository<MasterRequest, Long> {
 
+    boolean existsByRequestUserId(Long id);
 }
