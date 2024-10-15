@@ -6,8 +6,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    //Auth ErrorCode
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "가입되지 않은 유저입니다."),
+    EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호입니다."),
     // User ErrorCode
-
+    INVALID_USER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
+    PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
 
     // Attachment ErrorCode
 
@@ -32,6 +37,7 @@ public enum ErrorCode {
 
 
     // Search Errorcode
+    NOT_FOUND_NICKNAME(HttpStatus.NOT_FOUND, "해당 닉네임의 유저가 존재하지 않습니다."),
 
 
     // Notification Errorcode
