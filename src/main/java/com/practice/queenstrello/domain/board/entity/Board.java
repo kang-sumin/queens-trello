@@ -1,5 +1,7 @@
 package com.practice.queenstrello.domain.board.entity;
 
+import com.practice.queenstrello.domain.board.dto.request.BoardSaveRequest;
+import com.practice.queenstrello.domain.comment.entity.Comment;
 import com.practice.queenstrello.domain.common.entity.ModifiedTimestamped;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
@@ -36,9 +38,35 @@ public class Board extends ModifiedTimestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="workspace_id", nullable=false)
     private Workspace workspace;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardList> boardLists = new ArrayList<>();
 
+    public Board(BoardSaveRequest boardSaveRequest) {
+        this.id = boardSaveRequest.getId();
+        this.title = boardSaveRequest.getTitle();
+        this.backgroundColor = boardSaveRequest.getBackgroundColor();
+        this.imageUrl = boardSaveRequest.getImageUrl();
+    }
 
+    public Board(Long id, String title, String backgroundColor, String imageUrl) {
+        this.id = id;
+        this.title = title;
+        this.backgroundColor = backgroundColor;
+        this.imageUrl = imageUrl;
+    }
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
+    public void changeBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public void changeImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
