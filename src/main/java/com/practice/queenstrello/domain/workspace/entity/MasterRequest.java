@@ -24,4 +24,9 @@ public class MasterRequest extends CreatedTimestamped {
     @OneToOne
     @JoinColumn(name="request_user_id", nullable=false)
     private User requestUser;
+
+    public MasterRequest(Boolean isAccepted, User requestUser) {
+        this.isAccepted = isAccepted;
+        this.requestUser = requestUser;
+    }
 }
