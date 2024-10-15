@@ -1,9 +1,11 @@
 package com.practice.queenstrello.domain.card.controller;
 
 import com.practice.queenstrello.domain.card.dto.request.CardSaveRequest;
+import com.practice.queenstrello.domain.card.dto.request.CardUpdateRequest;
 import com.practice.queenstrello.domain.card.dto.response.CardDetailResponse;
 import com.practice.queenstrello.domain.card.dto.response.CardSaveResponse;
 import com.practice.queenstrello.domain.card.dto.response.CardSimpleResponse;
+import com.practice.queenstrello.domain.card.dto.response.CardUpdateResponse;
 import com.practice.queenstrello.domain.card.service.CardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,15 @@ public class CardController {
         CardDetailResponse cardDetailResponse = cardService.getCard(cardId);
         return ResponseEntity.ok(cardDetailResponse);
     }
+
+    //카드 수정
+    @PutMapping("/{cardId}")
+    public ResponseEntity<CardUpdateResponse> updateCard(@PathVariable Long cardId,@RequestBody CardUpdateRequest cardUpdateRequest, @RequestParam Long userId){
+        CardUpdateResponse updatedCard = cardService.updateCard(cardId,cardUpdateRequest,userId);
+        return ResponseEntity.ok(updatedCard);
+    }
+
+
 
 
 }

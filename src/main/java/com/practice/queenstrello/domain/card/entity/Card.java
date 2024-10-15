@@ -56,5 +56,11 @@ public class Card extends CreatedTimestamped {
         this.cardManagers.add(cardManager);
     }
 
+    //카드 수정 메서드
+    public void updateCard(String title, String content, LocalDateTime deadLine){
+        this.title=title;
+        this.content=content;
+        this.deadLine=deadLine;
+    }
 
 }
