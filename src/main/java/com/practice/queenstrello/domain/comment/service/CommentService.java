@@ -59,4 +59,13 @@ public class CommentService {
                 comment.getContent(),
                 comment.getModifiedAt());
     }
+
+    //댓글 삭제
+    public void deleteComment(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()->new IllegalArgumentException("유효하지 않은 댓글ID 입니다."));
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new IllegalStateException("본인의 댓글만 삭제할 수 있습니다.");
+        }
+        commentRepository.delete(comment);
+    }
 }
