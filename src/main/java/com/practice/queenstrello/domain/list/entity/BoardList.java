@@ -27,11 +27,40 @@ public class BoardList {
 
     @Column(name="list_order", nullable=false)
     private Integer order;
-
+    //Board와 다대일 관계 설정
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="borad_id", nullable=false)
+    @JoinColumn(name="board_id", nullable=false)
     private Board board;
-
-    @OneToMany(mappedBy = "boardList")
+    //Card와 일대다 관계 설정
+    @OneToMany(mappedBy = "boardList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cards = new ArrayList<>();
+    //생성자
+    public BoardList(String title, Integer order, Board board) {
+        this.title = title;
+        this.order = order;
+        this.board = board;
+    }
+
+    public BoardList(String title, Integer order) {
+        this.title = title;
+        this.order = order;
+    }
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+    //리스트 순서 수정 메서드
+    public void changeOrder(Integer order) {
+        this.order = order;
+    }
+    //리스트 카드 추가 메서드
+    public void addCard(Card card) {
+        cards.add(card);
+        card.setBoardList(this); //양방향 연관관계 설정
+    }
+    //리스트 카드 제거 메서드
+    public void removeCard(Card card) {
+        cards.remove(card);
+        card.setBoardList(null); //양방향 연관관계 해제
+    }
 }
