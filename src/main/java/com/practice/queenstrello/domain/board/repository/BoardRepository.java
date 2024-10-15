@@ -14,8 +14,9 @@ import java.util.List;
 public interface BoardRepository extends JpaRepository <Board, Long> {
     List<Board> findByWorkspaceId(Long workspaceId);
 //workspace_id 쿼리 생성
+//보드의 워크스페이스 ID 업데이트(JPQL 사용)
     @Modifying
     @Transactional
-    @Query("UPDATE Board b set b.workspace =:workspace WHERE b.id = :id")
-    void update(Long workspaceId);
+    @Query("UPDATE Board b set b.workspace =:workspaceId WHERE b.id = :boardId")
+    void updateWorkspace(Long boardId, Long workspaceId);
 }

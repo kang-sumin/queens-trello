@@ -29,7 +29,7 @@ public class BoardController {
         return ResponseEntity.ok(boardSaveResponse);
     }
 
-    @GetMapping("/{boardId}")
+    @GetMapping
     public ResponseEntity<List<BoardSaveResponse>> getBoards() {
         List<BoardSaveResponse> boardResponseList = boardService.getBoards();
         return ResponseEntity.ok(boardResponseList);

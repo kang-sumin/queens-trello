@@ -44,11 +44,11 @@ public class Board extends ModifiedTimestamped {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardList> boardLists = new ArrayList<>();
 
-    public Board(BoardSaveRequest boardSaveRequest) {
-        this.id = boardSaveRequest.getId();
+    public Board(BoardSaveRequest boardSaveRequest, Workspace workspace) {
         this.title = boardSaveRequest.getTitle();
         this.backgroundColor = boardSaveRequest.getBackgroundColor();
         this.imageUrl = boardSaveRequest.getImageUrl();
+        this.workspace = workspace;
     }
 
     public Board(Long id, String title, String backgroundColor, String imageUrl) {
@@ -68,5 +68,11 @@ public class Board extends ModifiedTimestamped {
 
     public void changeImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public void updateBoard(String title, String backgroundColor, String imageUrl) {
+        if (title != null) this.title = title;
+        if (backgroundColor != null) this.backgroundColor = backgroundColor;
+        if (imageUrl != null) this.imageUrl = imageUrl;
     }
 }
