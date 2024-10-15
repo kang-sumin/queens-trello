@@ -14,6 +14,7 @@ import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,9 +75,10 @@ public class CardService {
     }
 
     //카드 다건 조회
-    public Page<CardSimpleResponse> getCards(Long listId, Pageable pageable) {
+    public Page<CardSimpleResponse> getCards(Long listId, int page, int size) {
+        Pageable pagealbe = PageRequest.of(page -1,size);
 
-        Page<Card> cards = cardRepository.findByListIdWithManagers(listId,pageable);
+        Page<Card> cards = cardRepository.findByListIdWithManagers(listId, pagealbe);
 
         return cards.map(card -> new CardSimpleResponse(
                 card.getTitle(),
