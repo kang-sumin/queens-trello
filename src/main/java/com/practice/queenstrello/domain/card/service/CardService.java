@@ -1,12 +1,14 @@
 package com.practice.queenstrello.domain.card.service;
 
 import com.practice.queenstrello.domain.card.dto.request.CardSaveRequest;
+import com.practice.queenstrello.domain.card.dto.response.CardDetailResponse;
 import com.practice.queenstrello.domain.card.dto.response.CardSaveResponse;
 import com.practice.queenstrello.domain.card.dto.response.CardSimpleResponse;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.entity.CardManager;
 import com.practice.queenstrello.domain.card.repository.CardManagerRepository;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
+import com.practice.queenstrello.domain.comment.dto.response.CommentSaveResponse;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
@@ -76,8 +78,7 @@ public class CardService {
 
     //카드 다건 조회
     public Page<CardSimpleResponse> getCards(Long listId, int page, int size) {
-        Pageable pagealbe = PageRequest.of(page -1,size);
-
+        Pageable pagealbe = PageRequest.of(page,size);
         Page<Card> cards = cardRepository.findByListIdWithManagers(listId, pagealbe);
 
         return cards.map(card -> new CardSimpleResponse(
@@ -89,5 +90,23 @@ public class CardService {
                         .map(cardManager -> cardManager.getManager().getId())
                         .toList()
         ));
+    }
+
+    public CardDetailResponse getCard(long cardId) {
+        //카드정보 조회
+        Card card = cardRepository.findById(cardId).orElseThrow(()-> new IllegalArgumentException("유효하지 않은 카드 아이디 입니다."));
+
+        //카드 정보와 담당자 목록 리스폰스하기
+        return new CardDetailResponse(
+                card.getTitle(),
+                card.getContent(),
+                card.getDeadLine(),
+                card.getCardManagers().stream()
+                        .map(cardManager -> cardManager.getManager().getId())
+                        .toList(),
+                card.getComments().stream()
+                        .map(comment -> new CommentSaveResponse(comment.getId(),comment.getContent(), comment.getUser().getId(), comment.getCreatedAt()))
+                                .toList()
+        );
     }
 }

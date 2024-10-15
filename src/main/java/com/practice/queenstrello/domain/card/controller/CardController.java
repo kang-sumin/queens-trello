@@ -28,8 +28,7 @@ public class CardController {
 
     //카드 다건 조회
     @GetMapping
-    public ResponseEntity<Page<CardSimpleResponse>> getCards(@PathVariable Long listId, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page,size);
+    public ResponseEntity<Page<CardSimpleResponse>> getCards(@PathVariable Long listId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<CardSimpleResponse> cardSimpleResponses = cardService.getCards(listId,page,size);
         return ResponseEntity.ok(cardSimpleResponses);
     }
