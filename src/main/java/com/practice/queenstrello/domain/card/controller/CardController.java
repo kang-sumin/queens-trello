@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.card.controller;
 
 import com.practice.queenstrello.domain.card.dto.request.CardSaveRequest;
+import com.practice.queenstrello.domain.card.dto.response.CardDetailResponse;
 import com.practice.queenstrello.domain.card.dto.response.CardSaveResponse;
 import com.practice.queenstrello.domain.card.dto.response.CardSimpleResponse;
 import com.practice.queenstrello.domain.card.service.CardService;
@@ -31,6 +32,13 @@ public class CardController {
         Pageable pageable = PageRequest.of(page,size);
         Page<CardSimpleResponse> cardSimpleResponses = cardService.getCards(listId,page,size);
         return ResponseEntity.ok(cardSimpleResponses);
+    }
+
+    //카드 단건 조회
+    @GetMapping("/{cardId}")
+    public ResponseEntity<CardDetailResponse> getCard(@PathVariable long cardId) {
+        CardDetailResponse cardDetailResponse = cardService.getCard(cardId);
+        return ResponseEntity.ok(cardDetailResponse);
     }
 
 
