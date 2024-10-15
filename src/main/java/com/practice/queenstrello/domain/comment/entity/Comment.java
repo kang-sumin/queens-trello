@@ -12,23 +12,30 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name="comments")
+@Table(name = "comments")
 public class Comment extends ModifiedTimestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="comment_id")
+    @Column(name = "comment_id")
     private Long id;
 
-    @Column(name="comment_content", nullable=false, length=200)
+    @Column(name = "comment_content", nullable = false, length = 200)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="card_id", nullable = false)
+    @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    //댓글 생성자
+    public Comment(String content, Card card, User user) {
+        this.content = content;
+        this.card = card;
+        this.user = user;
+    }
 
 }
