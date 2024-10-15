@@ -31,5 +31,8 @@ public class User extends CreatedTimestamped {
     @Column(name="is_deleted",nullable=false)
     private Boolean isDeleted;
 
+    @Column(name="nickname", nullable=true, length=100)
+    private String nickname;
+
 
 }
