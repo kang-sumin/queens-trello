@@ -38,4 +38,9 @@ public class Comment extends ModifiedTimestamped {
         this.user = user;
     }
 
+    //댓글 수정 메서드
+    public void updateContent(String newContent){
+        this.content=newContent;
+    }
+
 }

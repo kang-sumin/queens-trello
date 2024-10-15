@@ -3,7 +3,9 @@ package com.practice.queenstrello.domain.comment.service;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.dto.request.CommentSaveRequest;
+import com.practice.queenstrello.domain.comment.dto.request.CommentUpdateRequest;
 import com.practice.queenstrello.domain.comment.dto.response.CommentSaveResponse;
+import com.practice.queenstrello.domain.comment.dto.response.CommentUpdateResponse;
 import com.practice.queenstrello.domain.comment.entity.Comment;
 import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.user.entity.User;
@@ -42,5 +44,18 @@ public class CommentService {
                 comment.getId(),
                 comment.getCreatedAt());
 
+    }
+
+    //댓글 수정
+    public CommentUpdateResponse updateComment(CommentUpdateRequest commentUpdateRequest, Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new IllegalArgumentException("유효하지 않은 댓글 아이디 입니다."));
+
+        if (!comment.getUser().getId().equals(userId)){
+            throw new IllegalStateException("본인 댓글만 수정 가능합니다.");
+        }
+        comment.updateContent(commentUpdateRequest.getContent()); //comment엔티티의 updatecontent메서드로 수정
+        return new CommentUpdateResponse(comment.getId(),
+                comment.getContent(),
+                comment.getModifiedAt());
     }
 }

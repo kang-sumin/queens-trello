@@ -1,7 +1,9 @@
 package com.practice.queenstrello.domain.comment.controller;
 
 import com.practice.queenstrello.domain.comment.dto.request.CommentSaveRequest;
+import com.practice.queenstrello.domain.comment.dto.request.CommentUpdateRequest;
 import com.practice.queenstrello.domain.comment.dto.response.CommentSaveResponse;
+import com.practice.queenstrello.domain.comment.dto.response.CommentUpdateResponse;
 import com.practice.queenstrello.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,4 +21,12 @@ public class CommentController {
         CommentSaveResponse response = commentService.saveComment(cardId, commentSaveRequest);
         return ResponseEntity.ok(response);
     }
+
+    //댓글 수정
+    @PutMapping("/{commentId}")
+    public ResponseEntity<CommentUpdateResponse> updateComment(@RequestBody CommentUpdateRequest commentUpdateRequest, @PathVariable Long commentId, @RequestParam Long userId){
+        CommentUpdateResponse response = commentService.updateComment(commentUpdateRequest,commentId,userId);
+        return ResponseEntity.ok(response);
+    }
+
 }
