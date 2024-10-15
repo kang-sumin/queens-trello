@@ -7,7 +7,8 @@ public class QueensTrelloException extends RuntimeException {
     private ErrorCode errorCode;
 
     public QueensTrelloException(ErrorCode errorCode) {
-
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 
 }
