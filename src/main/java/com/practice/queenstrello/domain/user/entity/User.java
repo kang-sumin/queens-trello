@@ -24,6 +24,9 @@ public class User extends CreatedTimestamped {
     @Column(name="password", nullable=false, length=255)
     private String password;
 
+    @Column(name="user_nickname", nullable = false, length = 50)
+    private String nickname;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private UserRole userRole;
