@@ -2,6 +2,8 @@ package com.practice.queenstrello.domain.user.entity;
 
 import com.practice.queenstrello.domain.common.entity.CreatedTimestamped;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,7 +34,14 @@ public class User extends CreatedTimestamped {
     private UserRole userRole;
 
     @Column(name="is_deleted",nullable=false)
-    private Boolean isDeleted;
+    private Boolean isDeleted = Boolean.FALSE;
 
 
+
+    public User(@NotBlank @Email String email, String encodedPassword, @NotBlank String nickname, UserRole userRole) {
+        this.email = email;
+        this.password = encodedPassword;
+        this.nickname = nickname;
+        this.userRole = userRole;
+    }
 }
