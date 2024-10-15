@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.card.entity;
 
 import com.practice.queenstrello.domain.comment.entity.Comment;
+import com.practice.queenstrello.domain.common.entity.CreatedTimestamped;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Table(name="cards")
-public class Card {
+public class Card extends CreatedTimestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,5 +42,19 @@ public class Card {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="list_id", nullable = false)
     private BoardList boardList;
+
+    //카드 생성자
+    public Card(String title, String content, LocalDateTime deadLine,BoardList boardList){
+        this.title=title;
+        this.content=content;
+        this.deadLine=deadLine;
+        this.boardList=boardList; //리스트와 연결
+    }
+
+    //담당자 추가 메서드
+    public void addCardManager(CardManager cardManager){
+        this.cardManagers.add(cardManager);
+    }
+
 
 }
