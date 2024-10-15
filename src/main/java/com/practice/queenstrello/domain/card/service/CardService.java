@@ -96,6 +96,7 @@ public class CardService {
         ));
     }
 
+    //카드 단건(상세) 조회
     public CardDetailResponse getCard(long cardId) {
         //카드정보 조회
         Card card = cardRepository.findById(cardId).orElseThrow(()-> new IllegalArgumentException("유효하지 않은 카드 아이디 입니다."));
@@ -114,6 +115,8 @@ public class CardService {
         );
     }
 
+    //카드 수정
+    @Transactional
     public CardUpdateResponse updateCard(Long cardId, CardUpdateRequest cardUpdateRequest, Long userId) {
         //수정하려는 사용자 권환 먼저 확인
         User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("유효하지 않은 사용자 Id 입니다."));
@@ -164,6 +167,8 @@ public class CardService {
 
     }
 
+    //카드 삭제
+    @Transactional
     public void deleteCard(Long cardId, Long userId) {
         //유저가 존재하는지 먼저 확인
         User user = userRepository.findById(userId).orElseThrow(()->new IllegalArgumentException("유효하지 않은 사용자 Id 입니다."));

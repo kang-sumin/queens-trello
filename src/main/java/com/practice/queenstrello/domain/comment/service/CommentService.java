@@ -23,7 +23,8 @@ public class CommentService {
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
 
-
+    //댓글 작성
+    @Transactional
     public CommentSaveResponse saveComment(CommentSaveRequest commentSaveRequest , Long cardId, Long userId) {
 
         //댓글 작성자 확인
@@ -48,6 +49,7 @@ public class CommentService {
     }
 
     //댓글 수정
+    @Transactional
     public CommentUpdateResponse updateComment(CommentUpdateRequest commentUpdateRequest, Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new IllegalArgumentException("유효하지 않은 댓글 아이디 입니다."));
 
@@ -61,6 +63,7 @@ public class CommentService {
     }
 
     //댓글 삭제
+    @Transactional
     public void deleteComment(Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(()->new IllegalArgumentException("유효하지 않은 댓글ID 입니다."));
         if (!comment.getUser().getId().equals(userId)) {
