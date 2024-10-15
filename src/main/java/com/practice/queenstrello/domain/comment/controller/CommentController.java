@@ -17,8 +17,8 @@ public class CommentController {
 
     //댓글 작성
     @PostMapping
-    public ResponseEntity<CommentSaveResponse> saveComment(@PathVariable long cardId, @RequestBody CommentSaveRequest commentSaveRequest) {
-        CommentSaveResponse response = commentService.saveComment(cardId, commentSaveRequest);
+    public ResponseEntity<CommentSaveResponse> saveComment(@RequestBody CommentSaveRequest commentSaveRequest,@PathVariable Long cardId, @RequestParam Long userId) {
+        CommentSaveResponse response = commentService.saveComment(commentSaveRequest,cardId,userId);
         return ResponseEntity.ok(response);
     }
 

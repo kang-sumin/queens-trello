@@ -24,9 +24,10 @@ public class CommentService {
     private final CardRepository cardRepository;
 
 
-    public CommentSaveResponse saveComment(long cardId, CommentSaveRequest commentSaveRequest) {
+    public CommentSaveResponse saveComment(CommentSaveRequest commentSaveRequest , Long cardId, Long userId) {
+
         //댓글 작성자 확인
-        User user = userRepository.findById(commentSaveRequest.getUserId()).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
 
         //읽기 전용 사용자 예외처리
         if (user.getUserRole().equals(UserRole.ROLE_USER)) {
