@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.user.controller;
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.user.dto.request.UserDeletionRequest;
 import com.practice.queenstrello.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;

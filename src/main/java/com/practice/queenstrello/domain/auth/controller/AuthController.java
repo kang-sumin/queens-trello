@@ -22,8 +22,8 @@ public class AuthController {
         return authService.signup(authSignupRequest);
     }
     // 로그인
-    @PostMapping("/auth/singin")
-    public AuthSigninResponse singin(@Valid @RequestBody AuthSigninRequest authSigninRequest) {
+    @PostMapping("/auth/signin")
+    public AuthSigninResponse signin(@Valid @RequestBody AuthSigninRequest authSigninRequest) {
         return authService.signin(authSigninRequest);
     }
 }

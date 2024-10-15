@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/signin", "/auth/signup", "/health").permitAll()
-                        .requestMatchers("/admin/..").hasAuthority(UserRole.Authority.ADMIN) // ADMIN 권한이 필요한 경로
+                        .requestMatchers("/admin/**").hasAuthority(UserRole.Authority.ADMIN) // ADMIN 권한이 필요한 경로
                         .anyRequest().authenticated()
                 )
                 .build();

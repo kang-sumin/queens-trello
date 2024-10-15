@@ -2,6 +2,7 @@ package com.practice.queenstrello.config;
 
 
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 
 import io.jsonwebtoken.Claims;
