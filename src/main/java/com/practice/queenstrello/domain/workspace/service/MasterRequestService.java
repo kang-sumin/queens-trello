@@ -5,7 +5,7 @@ import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.workspace.entity.MasterRequest;
-import com.practice.queenstrello.domain.workspace.repository.WorkspaceMasterRepository;
+import com.practice.queenstrello.domain.workspace.repository.MasterRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class WorkspaceMasterService {
+public class MasterRequestService {
 
     private final UserRepository userRepository;
-    private final WorkspaceMasterRepository workspaceMasterRepository;
+    private final MasterRequestRepository masterRequestRepository;
 
     // 일반 유저가 MASTER 권한 변경 신청 객체 저장
     @Transactional
@@ -34,7 +34,7 @@ public class WorkspaceMasterService {
                 false,
                 requestUser
         );
-        workspaceMasterRepository.save(newMasterRequest);
+        masterRequestRepository.save(newMasterRequest);
 
         return responseMessage;
     }
