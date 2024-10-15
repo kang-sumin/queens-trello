@@ -1,7 +1,7 @@
-package com.practice.queenstrello.domain.card.controller;
+package com.practice.queenstrello.domain.search.controller;
 
-import com.practice.queenstrello.domain.card.dto.SearchResponse;
-import com.practice.queenstrello.domain.card.service.SearchService;
+import com.practice.queenstrello.domain.search.dto.SearchResponse;
+import com.practice.queenstrello.domain.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;

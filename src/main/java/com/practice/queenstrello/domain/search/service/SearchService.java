@@ -1,6 +1,6 @@
-package com.practice.queenstrello.domain.card.service;
+package com.practice.queenstrello.domain.search.service;
 
-import com.practice.queenstrello.domain.card.dto.SearchResponse;
+import com.practice.queenstrello.domain.search.dto.SearchResponse;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.common.exception.NoNicnameUserException;
 import com.practice.queenstrello.domain.user.entity.User;

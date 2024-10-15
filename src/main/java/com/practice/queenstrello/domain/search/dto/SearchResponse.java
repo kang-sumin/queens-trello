@@ -1,4 +1,4 @@
-package com.practice.queenstrello.domain.card.dto;
+package com.practice.queenstrello.domain.search.dto;
 
 import com.practice.queenstrello.domain.card.entity.CardManager;
 import lombok.Getter;
