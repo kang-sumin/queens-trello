@@ -28,4 +28,11 @@ public class UserController {
         return ResponseEntity.ok("회원탈퇴가 완료되었습니다.");
     }
 
+    @PutMapping("/users/image")
+    public void changeImage(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestPart("file") MultipartFile file
+    ) {
+        userService.changeImage(authUser, file);
+    }
 }

@@ -1,5 +1,4 @@
 package com.practice.queenstrello.domain.auth;
-import com.practice.queenstrello.domain.user.controller.UserController;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

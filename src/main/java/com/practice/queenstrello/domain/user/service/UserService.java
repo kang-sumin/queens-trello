@@ -4,6 +4,7 @@ package com.practice.queenstrello.domain.user.service;
 import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.common.service.S3Service;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final S3Service s3Service;
 
     @Transactional
     public void deleteUser(Long userId, String password) {
@@ -34,8 +35,13 @@ public class UserService {
 
         // 논리적 삭제 처리 (isDeleted를 true로 설정)
         user.setIsDeleted(true);//메서드명 변경
-        // 사용자 정보를 업데이트
-        userRepository.save(user);//수정
-}
 
+}
+    @Transactional
+    public void changeImage(AuthUser authUser, MultipartFile file) {
+        User user = userRepository.findById(authUser.getUserId())
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
+        String uploadImageUrl = s3Service.uploadFile(file);
+        user.changeImage(uploadImageUrl);
+    }
 }

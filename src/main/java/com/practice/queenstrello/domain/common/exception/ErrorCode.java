@@ -41,6 +41,8 @@ public enum ErrorCode {
 
     // Notification Errorcode
 
+    //S 3service Errorcode
+    FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 에러입니다."),
 
 
     // ### 아래 코드 위에 ErrorCode 작성해 주세요! ErrorCode 메서드 사이는 ,(컴마)로 구분해 주세요! ###
