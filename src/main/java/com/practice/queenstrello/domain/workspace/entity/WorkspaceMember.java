@@ -20,7 +20,9 @@ public class WorkspaceMember {
     @Column(name="workspace_member_id")
     private Long id;
 
-    // 권한 컬럼 나중에 생성
+    @Enumerated(EnumType.STRING)
+    @Column(name="member_role")
+    private MemberRole memberRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -29,4 +31,10 @@ public class WorkspaceMember {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
+
+    public WorkspaceMember(MemberRole memberRole, User member, Workspace workspace) {
+        this.memberRole = memberRole;
+        this.member = member;
+        this.workspace = workspace;
+    }
 }
