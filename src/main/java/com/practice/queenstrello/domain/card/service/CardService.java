@@ -12,6 +12,8 @@ import com.practice.queenstrello.domain.card.repository.CardManagerRepository;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.dto.response.CommentSaveResponse;
 import com.practice.queenstrello.domain.comment.repository.CommentRepository;
+import com.practice.queenstrello.domain.common.exception.ErrorCode;
+import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
@@ -42,15 +44,15 @@ public class CardService {
     @Transactional
     public CardSaveResponse saveCard(CardSaveRequest cardSaveRequest, long listId, Long creatorId) {
         //카드생성자 확인
-        User creator = userRepository.findById(creatorId).orElseThrow(() -> new IllegalArgumentException("유효하지 않는 user id 입니다. "));
+        User creator = userRepository.findById(creatorId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
         //읽기전용이면 예외처리
         if (creator.getUserRole().equals(UserRole.ROLE_USER)) {
-            throw new IllegalStateException("읽기 전용 사용자는 카드를 생성할 수 없습니다.");
+            throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
         }
 
         //리스트 확인
-        BoardList boardList = boardListRepository.findById(listId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 listId 입니다."));
+        BoardList boardList = boardListRepository.findById(listId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_LIST));
 
 
         //카드생성(리스트랑 연결)
@@ -101,7 +103,7 @@ public class CardService {
     //카드 단건(상세) 조회
     public CardDetailResponse getCard(long cardId) {
         //카드정보 조회
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카드 아이디 입니다."));
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException((ErrorCode.INVALID_CARD)));
 
         //카드 정보와 담당자 목록 리스폰스하기
         return new CardDetailResponse(
@@ -121,15 +123,15 @@ public class CardService {
     @Transactional
     public CardUpdateResponse updateCard(Long cardId, CardUpdateRequest cardUpdateRequest, Long userId) {
         //수정하려는 사용자 권한 먼저 확인
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 Id 입니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
         //읽기전용인 사람은 예외처리
         if (user.getUserRole().equals(UserRole.ROLE_USER)) {
-            throw new IllegalStateException("읽기 전용 사용자는 카드를 수정할 수 없습니다.");
+            throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
         }
 
         //카드 찾기
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카드 Id 입니다."));
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
 
         //현재 시간 기록(언제 수정했는지 기록하기 위해서)
         LocalDateTime updateTime = LocalDateTime.now();
@@ -188,12 +190,12 @@ public class CardService {
     @Transactional
     public void deleteCard(Long cardId, Long userId) {
         //유저가 존재하는지 먼저 확인
-        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 Id 입니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
         //삭제하려는 카드 조회
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카드 Id 입니다."));
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
         //읽기전용 사용자는 카드 삭제 불가
         if (user.getUserRole().equals(UserRole.ROLE_USER)) {
-            throw new IllegalStateException("읽기 전용 사용자는 카드를 삭제할 수 없습니다.");
+            throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
         }
         //카드에 연결된 데이터(카드 매니저, 댓글..) 삭제
         cardManagerRepository.deleteByCardId(cardId); //담당자 삭제
