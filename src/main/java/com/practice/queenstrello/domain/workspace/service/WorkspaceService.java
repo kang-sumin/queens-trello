@@ -124,8 +124,7 @@ public class WorkspaceService {
 
         workspaceRepository.delete(workspace);
 
-        return String.format("%s 권한을 가진 %s 가 %s 워크스페이스를 삭제하였습니다."
-                , user.getUserRole(), user.getNickname(), workspace.getName());
+        return String.format("%s 가 {%s} 워크스페이스를 삭제하였습니다.", user.getNickname(), workspace.getName());
     }
 
 
