@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkspaceSaveRequest {
+public class WorkspaceRequest {
 
     @NotBlank
     private String name;
