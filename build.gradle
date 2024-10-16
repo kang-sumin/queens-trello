@@ -51,7 +51,7 @@ dependencies {
 
 
     //slack api
-    implementation 'com.slack.api:slack-api-client:1.27.2'
+    implementation 'com.slack.api:slack-api-client:1.39.2'
 //    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 }
 

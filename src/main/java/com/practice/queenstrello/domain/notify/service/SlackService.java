@@ -32,6 +32,8 @@ public class SlackService {
         try {
             slackClient.send(slackUrl, payload(p -> p
                     .text(title) // 메시지 제목
+                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
+                    .username("queens-trello")
                     .attachments(List.of(
                             Attachment.builder().color(Color.GREEN.getCode()) // 메시지 색상
                                     .text(message)            // 메시지 본문 내용
