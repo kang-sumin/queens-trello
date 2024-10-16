@@ -38,8 +38,6 @@ public class Board extends ModifiedTimestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="workspace_id", nullable=false)
     private Workspace workspace;
-    private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardList> boardLists = new ArrayList<>();
@@ -51,28 +49,46 @@ public class Board extends ModifiedTimestamped {
         this.workspace = workspace;
     }
 
-    public Board(Long id, String title, String backgroundColor, String imageUrl) {
+    public Board(Long id, String title, String backgroundColor, String imageUrl, Workspace workspace) {
         this.id = id;
         this.title = title;
         this.backgroundColor = backgroundColor;
         this.imageUrl = imageUrl;
+        this.workspace = workspace;
     }
 
     public void changeTitle(String title) {
-        this.title = title;
+        if (title != null && !title.isEmpty()) {
+            this.title = title;
+        }
     }
 
     public void changeBackgroundColor(String backgroundColor) {
-        this.backgroundColor = backgroundColor;
+        if (backgroundColor != null && !backgroundColor.isEmpty()) {
+            this.backgroundColor = backgroundColor;
+        }
     }
 
     public void changeImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            this.imageUrl = imageUrl;
+        }
     }
 
     public void updateBoard(String title, String backgroundColor, String imageUrl) {
-        if (title != null) this.title = title;
-        if (backgroundColor != null) this.backgroundColor = backgroundColor;
-        if (imageUrl != null) this.imageUrl = imageUrl;
+        changeTitle(title);
+        changeBackgroundColor(backgroundColor);
+        changeImageUrl(imageUrl);
     }
+
+    public void addBoardList(BoardList boardList) {
+        boardLists.add(boardList);
+        boardList.setBoard(this);
+    }
+
+    public void removeBoardList(BoardList boardList) {
+        boardLists.remove(boardList);
+        boardList.setBoard(null);
+    }
+
 }
