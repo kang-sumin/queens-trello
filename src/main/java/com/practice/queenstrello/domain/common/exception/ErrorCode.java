@@ -22,6 +22,7 @@ public enum ErrorCode {
 
 
     // Workspace Errorcode
+    No_WORKSPACE_MASTER(HttpStatus.NOT_FOUND, "해당하는 유저는 워크스페이스를 가지고 있지 않습니다"),
     HAS_NOT_ACCESS_PERMISSION_MASTER_REQUEST(HttpStatus.FORBIDDEN, "Master 변경 요청 권한이 없습니다."),
     MASTER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Master 요청 내역이 없습니다."),
     MASTER_REQUEST_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 Master 권한 요청 내역이 존재합니다."),

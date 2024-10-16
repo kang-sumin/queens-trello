@@ -34,13 +34,30 @@ public class SlackController {
 
     /**
      * 마스터 권한 힉득 메세지
-     * @param userId
-     * @return
+     * @param userId : 알림을 받을 유저 ID
+     * @return 성공여부
      */
     @PostMapping("/master/{userId}")
     public String upgradeMaster(@PathVariable Long userId) {
         try {
             slackService.upgradeMaster(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+        return "success";
+    }
+
+    /**
+     * 
+     * @param inviterId  초대한 유저ID
+     * @param invitedId  초대받은 유저 ID
+     * @return 성공 여부
+     */
+    @PostMapping("/invite/{inviterId}/{invitedId}")
+    public String invite(@PathVariable Long inviterId, @PathVariable Long invitedId) {
+        try {
+            slackService.inviteMember(inviterId, invitedId);
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";
