@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,4 +25,13 @@ public class MasterRequest extends CreatedTimestamped {
     @OneToOne
     @JoinColumn(name="request_user_id", nullable=false)
     private User requestUser;
+
+    public MasterRequest(Boolean isAccepted, User requestUser) {
+        this.isAccepted = isAccepted;
+        this.requestUser = requestUser;
+    }
+
+    public void updateIsAccepted(Boolean isAccepted) {
+        this.isAccepted = isAccepted;
+    }
 }
