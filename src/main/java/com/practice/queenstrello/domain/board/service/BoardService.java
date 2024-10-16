@@ -6,6 +6,7 @@ import com.practice.queenstrello.domain.board.dto.response.BoardSaveResponse;
 import com.practice.queenstrello.domain.board.entity.Board;
 import com.practice.queenstrello.domain.board.repository.BoardRepository;
 import com.practice.queenstrello.domain.card.entity.Card;
+import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +20,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
-    //워크스페이스 레파지토리 추가
+    private final WorkspaceRepository workspaceRepository;
 
     @Transactional
     public BoardSaveResponse savedBoard(BoardSaveRequest boardSaveRequest, User user) {
         validateUser(user);// 로그인체크
 
-        Workspace workspace = workspaceRepository.findById(request.getWorkspaceId())
+        Workspace workspace = workspaceRepository.findById(Request.getWorkspaceId())
                 .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));
 
         if (user.isReadOnly()) {
-            throw new PermissionDeniedException("보드를 생성할 권한이 없습니다.");
+            throw new QueensTrelloException("보드를 생성할 권한이 없습니다.");
         }
 
         if (boardSaveRequest.getTitle() == null || boardSaveRequest.getTitle().isEmpty()) {
@@ -69,7 +70,7 @@ public class BoardService {
         Board newBoard = boardRepository.findById(boardId)
                 .orElseThrow(()-> new IllegalArgumentException("해당 보드를 찾을 수 없습니다."));
         if (user.isReadOnly()) {
-            throw new PermissionDeniedException("보드를 수정할 권한이 없습니다.");
+            throw new QueensTrelloException("보드를 수정할 권한이 없습니다.");
         }
         if (boardRequest.getTitle() != null) {
             newBoard.changeTitle(boardRequest.getTitle());
@@ -99,7 +100,7 @@ public class BoardService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 보드를 찾을 수 없습니다."));
 
         if (user.isReadOnly()) {
-            throw new PermissionDeniedException("보드를 삭제할 권한이 없습니다.");
+            throw new QueensTrelloException("보드를 삭제할 권한이 없습니다.");
         }
 
         boardRepository.delete(board);

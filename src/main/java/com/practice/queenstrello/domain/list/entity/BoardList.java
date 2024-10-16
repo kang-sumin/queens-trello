@@ -27,12 +27,12 @@ public class BoardList {
 
     @Column(name="list_order", nullable=false)
     private Integer order;
-    //Board와 다대일 관계 설정
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="board_id", nullable=false)
     private Board board;
-    //Card와 일대다 관계 설정
-    @OneToMany(mappedBy = "boardList", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "boardList")
     private List<Card> cards = new ArrayList<>();
     //생성자
     public BoardList(String title, Integer order, Board board) {
@@ -63,4 +63,5 @@ public class BoardList {
         cards.remove(card);
         card.setBoardList(null); //양방향 연관관계 해제
     }
+
 }

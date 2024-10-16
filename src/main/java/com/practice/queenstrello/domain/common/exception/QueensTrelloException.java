@@ -11,4 +11,7 @@ public class QueensTrelloException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    public QueensTrelloException(String message) {
+        super(message);
+    }
 }
