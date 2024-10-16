@@ -28,6 +28,8 @@ public enum ErrorCode {
     HAS_NOT_ACCESS_PERMISSION(HttpStatus.CONFLICT, "해당 서비스에 접근 권한이 없습니다."),
     INVALID_MEMBER_ROLE(HttpStatus.UNPROCESSABLE_ENTITY,"유효하지 않은 MemberRole 입니다."),
     WORKSPACE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 워크스페이스를 찾지 못하였습니다."),
+    WORKSPACE_MEMBER_NOT_FOUND(HttpStatus.BAD_GATEWAY, "해당 워크스페이스에서 멤버를 찾지 못했습니다."),
+    SAME_EXIST_MEMBER_ROLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 멤버 권한과 변경하고자 하는 멤버 권한이 같습니다."),
 
 
     // Board Errorcode

@@ -64,7 +64,7 @@ public class WorkspaceService {
         User user = User.fromAuthUser(authUser);
 
         // 로그인 사용자가 USER 권한 일때 MemberRole이 WORKSPACE가 아닐때 예외 처리
-        if (user.getUserRole().equals(UserRole.ROLE_USER) && !(workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(authUser.getUserId(), workspaceId, MemberRole.WORKSPACE))){
+        if (user.getUserRole().equals(UserRole.ROLE_USER) && !(workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(authUser.getUserId(), workspaceId, MemberRole.WORKSPACE))) {
             throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
         }
 
@@ -74,7 +74,7 @@ public class WorkspaceService {
 
         // 이메일을 사용하여 사용자 검색
         User inviteMember = userRepository.findByEmail(workspaceMemberEmailRequest.getEmail())
-                .orElseThrow(()-> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
 
         // 사용자를 워크스페이스 멤버로 추가
@@ -113,17 +113,33 @@ public class WorkspaceService {
         );
     }
 
+    // 워크 스페이스 삭제
+    @Transactional
+    public String deleteWorkspace(Long workspaceId, AuthUser authUser) {
+
+        User user = checkPermission(authUser, workspaceId);
+
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+
+        workspaceRepository.delete(workspace);
+
+        return String.format("%s 가 {%s} 워크스페이스를 삭제하였습니다.", user.getNickname(), workspace.getName());
+    }
+
+
     // 워크스페이스 서비스 권한 확인
     private User checkPermission(AuthUser authUser, Long workspaceId) {
         // 로그인한 사용자
         User user = User.fromAuthUser(authUser);
 
         // 로그인 사용자가 USER 권한 일때 MemberRole이 WORKSPACE가 아닐때 예외 처리
-        if (user.getUserRole().equals(UserRole.ROLE_USER) && !(workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(authUser.getUserId(), workspaceId, MemberRole.WORKSPACE))){
+        if (user.getUserRole().equals(UserRole.ROLE_USER) && !(workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(authUser.getUserId(), workspaceId, MemberRole.WORKSPACE))) {
             throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
         }
 
         return user;
     }
+
 
 }
