@@ -7,6 +7,8 @@ import com.practice.queenstrello.domain.auth.dto.response.AuthSignupResponse;
 import com.practice.queenstrello.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,15 +18,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+
     // 회원가입
     @PostMapping("/auth/signup")
-    public AuthSignupResponse signup(@Valid @RequestBody AuthSignupRequest authSignupRequest) {
+    public ResponseEntity<AuthSignupResponse> signup(@Validated @RequestBody AuthSignupRequest authSignupRequest) {
         return authService.signup(authSignupRequest);
     }
+
     // 로그인
     @PostMapping("/auth/signin")
-    public AuthSigninResponse signin(@Valid @RequestBody AuthSigninRequest authSigninRequest) {
+    public ResponseEntity<AuthSigninResponse> signin(@Validated @RequestBody AuthSigninRequest authSigninRequest) {
         return authService.signin(authSigninRequest);
     }
 }
+
+
 
