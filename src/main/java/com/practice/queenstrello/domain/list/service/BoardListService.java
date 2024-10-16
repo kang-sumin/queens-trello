@@ -27,7 +27,7 @@ public class BoardListService {
     @Transactional
     public BoardListSaveResponse updateBoardList(long boardListId, BoardListUpdateRequest boardListUpdateRequest) {
         BoardList boardList = boardListRepository.findById(boardListId)
-                .orElseThrow(()-> new QueensTrelloException(ErrorCode.LIST_NOT_FOUND));
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
         if (boardListUpdateRequest.getTitle() != null) {
             boardList.changeTitle(boardListUpdateRequest.getTitle());
         }
@@ -40,7 +40,7 @@ public class BoardListService {
     @Transactional
     public void deleteBoardList(long boardListId) {
         BoardList boardList = boardListRepository.findById(boardListId)
-                .orElseThrow(()-> new QueensTrelloException(ErrorCode.LIST_NOT_FOUND));
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
         boardListRepository.delete(boardList);
 
     }

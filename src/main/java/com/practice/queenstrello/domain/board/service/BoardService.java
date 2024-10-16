@@ -35,7 +35,7 @@ public class BoardService {
         }
 
         if (boardSaveRequest.getTitle() == null || boardSaveRequest.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("보드 제목은 필수입니다.");
+            throw new QueensTrelloException(ErrorCode.TITLE_ESSENTIAL);
         }
 
         Board newBoard = new Board(
@@ -52,7 +52,7 @@ public class BoardService {
 
     public BoardSaveResponse getBoard(long boardId) {
         Board newBoard = boardRepository.findById(boardId)
-                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND) );
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
         return BoardSaveResponse.of(newBoard);
     }
 
