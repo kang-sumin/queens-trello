@@ -30,7 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -185,26 +188,49 @@ public class CardService {
         // 2. 요청에서 들어온 담당자 ID 리스트
         List<Long> newManagerIds = cardUpdateRequest.getManagerIds();
         // 3. 기존 담당자 중에서 제거할 담당자들 삭제 ->IN절
+//        for (CardManager existingManager : existingManagers) {
+//            if (!newManagerIds.contains(existingManager.getManager().getId())) {
+//                cardManagerRepository.deleteByCardIdAndManagerId(cardId, existingManager.getManager().getId());
+//            }
+//        }
+        Set<Long> existingManagerIds = existingManagers.stream()
+                .map(manager -> manager.getManager().getId())
+                .collect(Collectors.toSet());
+
+        Set<Long> newManagerIdSet = new HashSet<>(newManagerIds);
+
+        // 기존 담당자 중에서 새로운 리스트에 없는 담당자를 삭제
         for (CardManager existingManager : existingManagers) {
-            if (!newManagerIds.contains(existingManager.getManager().getId())) {
+            if (!newManagerIdSet.contains(existingManager.getManager().getId())) {
                 cardManagerRepository.deleteByCardIdAndManagerId(cardId, existingManager.getManager().getId());
             }
         }
-        // 4. 새로 추가할 담당자 추가 saveall
+        // 4. 새로 추가할 담당자 추가
         List<User> newManagers = userRepository.findAllById(newManagerIds);
-        for (User manager : newManagers) {
-            //이미 등록된 담당자가 아닐 때에 비로소 추가하게끔 조건 걸기. 먼저 리스트를 "비교"하고, 있는건 두고 없어진 목록들만 따로 날리고 새로운것들 넣고
-            if (existingManagers.stream().noneMatch(cardManager -> cardManager.getManager().getId().equals(manager.getId()))) {
-                CardManager newCardManager = new CardManager(card, manager);
-                card.addCardManager(newCardManager);
-                cardManagerRepository.save(newCardManager);
-            }
+
+        // 새로운 담당자 중 기존에 없는 담당자만 추가
+        List<CardManager> managersToAdd = newManagers.stream()
+                .filter(manager -> !existingManagerIds.contains(manager.getId()))
+                .map(manager -> new CardManager(card, manager))
+                .collect(Collectors.toList());
+
+        if (!managersToAdd.isEmpty()) {
+            cardManagerRepository.saveAll(managersToAdd);
         }
+
+//        for (User manager : newManagers) {
+//            //이미 등록된 담당자가 아닐 때에 비로소 추가하게끔 조건 걸기. 먼저 리스트를 "비교"하고, 있는건 두고 없어진 목록들만 따로 날리고 새로운것들 넣고
+//            if (existingManagers.stream().noneMatch(cardManager -> cardManager.getManager().getId().equals(manager.getId()))) {
+//                CardManager newCardManager = new CardManager(card, manager);
+//                card.addCardManager(newCardManager);
+//                cardManagerRepository.save(newCardManager);
+//            }
+//        }
 
         //5. 수정된 담당자 리스트 반환
         List<Long> updatedManagerIds = newManagers.stream()
                 .map(User::getId)
-                .toList();
+                .collect(Collectors.toList());
 
 
         return new CardUpdateResponse(card.getId(),
