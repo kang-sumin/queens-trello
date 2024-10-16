@@ -13,6 +13,7 @@ public enum ErrorCode {
     // User ErrorCode
     INVALID_USER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
     PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    USER_HAS_NOT_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // Attachment ErrorCode
 
@@ -21,6 +22,10 @@ public enum ErrorCode {
 
 
     // Workspace Errorcode
+    HAS_NOT_ACCESS_PERMISSION_MASTER_REQUEST(HttpStatus.FORBIDDEN, "Master 변경 요청 권한이 없습니다."),
+    MASTER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Master 요청 내역이 없습니다."),
+    MASTER_REQUEST_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 Master 권한 요청 내역이 존재합니다."),
+    HAS_NOT_ACCESS_PERMISSION(HttpStatus.CONFLICT, "해당 서비스에 접근 권한이 없습니다."),
 
 
     // Board Errorcode
@@ -44,16 +49,14 @@ public enum ErrorCode {
     // Notification Errorcode
 
 
-
     // ### 아래 코드 위에 ErrorCode 작성해 주세요! ErrorCode 메서드 사이는 ,(컴마)로 구분해 주세요! ###
     NOT_FOUND(HttpStatus.NOT_FOUND, "찾지못했습니다.");
-
 
 
     private final HttpStatus status;
     private final String message;
 
-    ErrorCode(HttpStatus httpStatus, String message){
+    ErrorCode(HttpStatus httpStatus, String message) {
         this.status = httpStatus;
         this.message = message;
     }
