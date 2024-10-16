@@ -9,7 +9,10 @@ import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
+import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceSaveRequest;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
+import com.practice.queenstrello.domain.workspace.repository.WorkspaceRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,15 +22,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+
 public class BoardService {
     private final BoardRepository boardRepository;
     private final WorkspaceRepository workspaceRepository;
 
     @Transactional
-    public BoardSaveResponse savedBoard(BoardSaveRequest boardSaveRequest, User user) {
+    public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, User user) {
         validateUser(user);// 로그인체크
 
-        Workspace workspace = workspaceRepository.findById(Request.getWorkspaceId())
+        Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));
 
         if (user.isReadOnly()) {
@@ -57,7 +61,8 @@ public class BoardService {
     }
 
     public List<BoardSaveResponse> getBoards(Long workspaceId) {
-        Long workspaceId = null; //todo workspace or repository 에서 추가
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));
         List<Board> boardList = boardRepository.findByWorkspaceId(workspaceId);
         //각 board에 속한 card들을 가져와 매핑
         return boardList.stream()

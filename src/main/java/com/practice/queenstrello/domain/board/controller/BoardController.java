@@ -13,15 +13,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/boards")
+@RequestMapping("/{workspaceId}/boards")
 @RestController
 @RequiredArgsConstructor
 public class BoardController {
     private final BoardService boardService;
 
     @PostMapping
-    public ResponseEntity<BoardSaveResponse> savedBoard(@RequestBody BoardSaveRequest boardSaveRequest, @RequestAttribute("user") User user) {
-        BoardSaveResponse boardSaveResponse = boardService.savedBoard(boardSaveRequest, user);
+    public ResponseEntity<BoardSaveResponse> savedBoard(@PathVariable("workspaceId") Long workspaceId, @RequestBody BoardSaveRequest boardSaveRequest, @RequestAttribute("user") User user) {
+        BoardSaveResponse boardSaveResponse = boardService.savedBoard(workspaceId, boardSaveRequest, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(boardSaveResponse);
 
     }

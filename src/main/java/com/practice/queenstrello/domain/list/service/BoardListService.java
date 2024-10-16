@@ -1,6 +1,5 @@
 package com.practice.queenstrello.domain.list.service;
 
-import com.practice.queenstrello.domain.board.entity.Board;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.list.dto.request.BoardListSaveRequest;
@@ -8,11 +7,10 @@ import com.practice.queenstrello.domain.list.dto.request.BoardListUpdateRequest;
 import com.practice.queenstrello.domain.list.dto.response.BoardListSaveResponse;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
+import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.lang.reflect.Member;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +41,7 @@ public class BoardListService {
     }
 
     @Transactional
-    public void deleteBoardList(long boardListId) {
+    public void deleteBoardList(long boardListId, WorkspaceMember member) {
         validateWritePermission(member);
 
         BoardList boardList = boardListRepository.findById(boardListId)
@@ -53,7 +51,7 @@ public class BoardListService {
     }
 
     //쓰기 권한 검증
-    private void validateWritePermission(Member member) {
+    private void validateWritePermission(WorkspaceMember member) {
         if (member.getRole() == Role.READ_ONLY) {
             throw new PermissionDeniedException("읽기 전용 멤버는 이 작업을 수행할 수 없습니다.");
 
