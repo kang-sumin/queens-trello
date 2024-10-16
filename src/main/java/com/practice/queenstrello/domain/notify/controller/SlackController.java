@@ -1,12 +1,11 @@
 package com.practice.queenstrello.domain.notify.controller;
 
-import com.practice.queenstrello.domain.auth.AuthUser;
-import com.practice.queenstrello.domain.notify.dto.request.SlackMessageRequest;
 import com.practice.queenstrello.domain.notify.service.SlackService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/slack")
@@ -14,23 +13,6 @@ import org.springframework.web.bind.annotation.*;
 public class SlackController {
     private final SlackService slackService;
 
-    /**
-     * 기본 메세지 전송 test
-     * @param authUser : 로그인된 회원정보
-     * @param request  : 메세지 내용
-     * @return  성공여부
-     */
-
-    @PostMapping("/send")
-    public String sendMessage(@AuthenticationPrincipal AuthUser authUser, @RequestBody @Valid SlackMessageRequest request) {
-        try {
-            slackService.sendMessage(authUser.getUserId(), request.getTitle(), request.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "fail";
-        }
-        return "success";
-    }
 
     /**
      * 마스터 권한 힉득 메세지
@@ -65,6 +47,12 @@ public class SlackController {
         return "success";
     }
 
+    /**
+     * 멤버 추가 알림
+     * @param userId 알림을 받을 유저 ID
+     * @param memberId 추가된 멤버의 ID
+     * @return 성공 여부
+     */
     @PostMapping("/member/{userId}/{memberId}")
     public String addMember(@PathVariable Long userId, @PathVariable Long memberId) {
         try {
@@ -76,6 +64,12 @@ public class SlackController {
         return "success";
     }
 
+    /**
+     *
+     * @param userId 알림을 받을 유저 ID
+     * @param cardId 변경된 카드 ID
+     * @return 성공 여부
+     */
     @PostMapping("/card/{userId}/{cardId}")
     public String changeCard(@PathVariable Long userId, @PathVariable Long cardId) {
         try {
@@ -86,6 +80,13 @@ public class SlackController {
         }
         return "success";
     }
+
+    /**
+     *
+     * @param userId 알림을 받을 유저 ID
+     * @param commentId 생성된 댓글 ID
+     * @return 성공 여부
+     */
     @PostMapping("/comment/{userId}/{commentId}")
     public String addComment(@PathVariable Long userId, @PathVariable Long commentId) {
         try {

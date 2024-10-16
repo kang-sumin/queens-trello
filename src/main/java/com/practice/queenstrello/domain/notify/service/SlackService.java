@@ -48,19 +48,50 @@ public class SlackService {
     /**
      * 슬랙 메시지 전송
      **/
-    public void sendMessage(Long userId, String title, String message) {
-        User user = userRepository.findById(userId).orElseThrow(()->new NullPointerException("해당하는 아이디의 유저가 없습니다."));
-        String slackUrl = user.getSlackUrl();
+    public void sendMessage(Classification classification, String slackUrl, String title, String message, String content, String fieldTitle, String fieldContent) {
         try {
-            slackClient.send(slackUrl, payload(p -> p
-                    .text(title) // 메시지 제목
-                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
-                    .username("queens-trello")
-                    .attachments(List.of(
-                            Attachment.builder().color(Color.GREEN.getCode()) // 메시지 색상
-                                    .text(message)            // 메시지 본문 내용
-                                    .build())))
-            );
+            //알림 안에 링크가 들어간 경우
+            if(classification.equals(Classification.Master)||classification.equals(Classification.Invite)) {
+                slackClient.send(slackUrl, payload(p -> p
+                        .text(title) // 메시지 제목
+                        .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
+                        .username("queens-trello")
+                        .attachments(List.of(
+                                Attachment.builder()
+                                        .color(Color.GREEN.getCode()) // 메시지 색상
+                                        .pretext(message)// 메시지 본문 내용
+                                        .text(content)  //이동할 url
+                                        .build())))
+
+                );
+                //자세한 내용이 있는 경우
+            } else if(classification.equals(Classification.Card)||classification.equals(Classification.Comment)) {
+                slackClient.send(slackUrl, payload(p -> p
+                        .text(title) // 메시지 제목
+                        .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
+                        .username("queens-trello")
+                        .attachments(List.of(
+                                Attachment.builder()
+                                        .color(Color.GREEN.getCode()) // 메시지 색상
+                                        .pretext(message)// 메시지 본문 내용
+                                        .fields(List.of(
+                                                new Field(fieldTitle, fieldContent, false)
+                                        ))
+                                        .build())))
+                );
+                //알림 내용이 한줄인 경우
+            } else {
+                slackClient.send(slackUrl, payload(p -> p
+                        .text(title) // 메시지 제목
+                        .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
+                        .username("queens-trello")
+                        .attachments(List.of(
+                                Attachment.builder()
+                                        .color(Color.GREEN.getCode()) // 메시지 색상
+                                        .pretext(message)// 메시지 본문 내용
+                                        .build())))
+                );
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,25 +102,11 @@ public class SlackService {
         String title = classification.getTitle();
         String message = "당신은 마스터로 승급되었습니다. 당신만의 워크스페이스를 만들어보세요!";
         String createUrl = combineAddress()+"/workspace";
+        String content = "<"+createUrl+"|"+"워크스페이스 생성하기"+">";
 
         User user = userRepository.findById(userId).orElseThrow(()->new QueensTrelloException(ErrorCode.INVALID_USER));
         String slackUrl = user.getSlackUrl();
-        try {
-            slackClient.send(slackUrl, payload(p -> p
-                    .text(title) // 메시지 제목
-                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
-                    .username("queens-trello")
-                    .attachments(List.of(
-                            Attachment.builder()
-                                    .color(Color.GREEN.getCode()) // 메시지 색상
-                                    .pretext(message)// 메시지 본문 내용
-                                    .text("<"+createUrl+"|"+"워크스페이스 생성하기"+">")  //워크스페이스 생성 url
-                                    .build())))
-
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendMessage(classification, slackUrl, title, message, content,null,null);
     }
 
     public void inviteMember(Long inviterId, Long invitedId) {
@@ -100,23 +117,9 @@ public class SlackService {
         String title = inviter.getNickname() + classification.getTitle();
         Workspace workspace = workspaceRepository.findByMasterUser(inviter).orElseThrow(()-> new QueensTrelloException(ErrorCode.No_WORKSPACE_MASTER));
         String moveUrl = combineAddress()+"/workspaces/"+workspace.getId();
+        String content = "<"+moveUrl+"|"+workspace.getName()+"> \n" +workspace.getDescription();
         String message = inviter.getNickname()+"님의 작업공간 "+workspace.getName() +" 입니다! \n 우리 함께 끝까지 달려봐요!";
-
-        try {
-            slackClient.send(slackUrl, payload(p -> p
-                    .text(title) // 메시지 제목
-                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
-                    .username("queens-trello")
-                    .attachments(List.of(
-                            Attachment.builder()
-                                    .color(Color.GREEN.getCode()) // 메시지 색상
-                                    .pretext(message)// 메시지 본문 내용
-                                    .text("<"+moveUrl+"|"+workspace.getName()+"> \n" +workspace.getDescription())
-                                    .build())))
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendMessage(classification, slackUrl, title, message, content,null,null);
     }
 
 
@@ -127,21 +130,7 @@ public class SlackService {
         String title = classification.getTitle();
         User member = userRepository.findById(memberId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
         String message = "우리 워크스페이스에 "+ member.getNickname()+"님이 오셨어요! 어서 와서 환영해주세요!";
-        try {
-            slackClient.send(slackUrl, payload(p -> p
-                    .text(title) // 메시지 제목
-                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
-                    .username("queens-trello")
-                    .attachments(List.of(
-                            Attachment.builder()
-                                    .color(Color.GREEN.getCode()) // 메시지 색상
-                                    .pretext(message)// 메시지 본문 내용
-                                    .build())))
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        sendMessage(classification, slackUrl, title, message,null,null,null);
     }
 
     public void changeCard(Long userId, Long cardId) {
@@ -153,23 +142,7 @@ public class SlackService {
         Classification classification = Classification.Card;
         String title = classification.getTitle();
         String message = card.getTitle()+" 카드 내용을 꼼꼼히 확인하세요!";
-        try {
-            slackClient.send(slackUrl, payload(p -> p
-                    .text(title) // 메시지 제목
-                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
-                    .username("queens-trello")
-                    .attachments(List.of(
-                            Attachment.builder()
-                                    .color(Color.GREEN.getCode()) // 메시지 색상
-                                    .pretext(message)// 메시지 본문 내용
-                                     .fields(List.of(
-                                             new Field(card.getTitle(), card.getContent(), false)
-                                     ))
-                                    .build())))
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendMessage(classification, slackUrl, title, message,null,card.getTitle(),card.getContent());
     }
 
     public void addComment(Long userId, Long commentId) {
@@ -180,24 +153,8 @@ public class SlackService {
         String slackUrl = receiver.getSlackUrl();
         Classification classification = Classification.Comment;
         String title = classification.getTitle();
-        String message = card.getTitle() +"카드에 "+comment.getUser().getNickname()+"님이 댓글을 다셨습니다.";
-        try {
-            slackClient.send(slackUrl, payload(p -> p
-                    .text(title) // 메시지 제목
-                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
-                    .username("queens-trello")
-                    .attachments(List.of(
-                            Attachment.builder()
-                                    .color(Color.GREEN.getCode()) // 메시지 색상
-                                    .pretext(message)// 메시지 본문 내용
-                                    .fields(List.of(
-                                            new Field("From."+comment.getUser().getNickname(), comment.getContent(), false)
-                                    ))
-                                    .build())))
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String message = card.getTitle() +"카드에 "+comment.getUser().getNickname()+"님이 작성한 댓글입니다.";
+        sendMessage(classification, slackUrl, title, message,null,"From."+comment.getUser().getNickname(),comment.getContent());
     }
 
     private String combineAddress() {
