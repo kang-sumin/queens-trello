@@ -42,7 +42,8 @@ public enum ErrorCode {
     NOT_CARD_MANAGER(HttpStatus.BAD_REQUEST,"해당 카드의 매니저가 아닙니다."),
 
     // Comment Errorcode
-
+    INVALID_COMMENT(HttpStatus.BAD_REQUEST,"유효하지 않은 commentId 입니다."),
+    INVALID_COMMENTUSER(HttpStatus.METHOD_NOT_ALLOWED,"본인 댓글만 수정 및 삭제가 가능합니다."),
 
     // Search Errorcode
     NOT_FOUND_NICKNAME(HttpStatus.NOT_FOUND, "해당 닉네임의 유저가 존재하지 않습니다."),

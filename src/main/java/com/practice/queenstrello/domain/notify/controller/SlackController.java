@@ -86,5 +86,15 @@ public class SlackController {
         }
         return "success";
     }
+    @PostMapping("/comment/{userId}/{commentId}")
+    public String addComment(@PathVariable Long userId, @PathVariable Long commentId) {
+        try {
+            slackService.addComment(userId, commentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+        return "success";
+    }
 
 }

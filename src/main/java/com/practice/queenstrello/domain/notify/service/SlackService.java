@@ -3,6 +3,8 @@ package com.practice.queenstrello.domain.notify.service;
 import com.practice.queenstrello.config.Color;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
+import com.practice.queenstrello.domain.comment.entity.Comment;
+import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.notify.entity.Classification;
@@ -38,6 +40,7 @@ public class SlackService {
     private final UserRepository userRepository;
     private final WorkspaceRepository workspaceRepository;
     private final CardRepository cardRepository;
+    private final CommentRepository commentRepository;
 
     private final Slack slackClient = Slack.getInstance();
 
@@ -162,6 +165,34 @@ public class SlackService {
                                      .fields(List.of(
                                              new Field(card.getTitle(), card.getContent(), false)
                                      ))
+                                    .build())))
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addComment(Long userId, Long commentId) {
+        User receiver = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new QueensTrelloException(ErrorCode.INVALID_COMMENT));
+        Card card = comment.getCard();
+        if(card.getCardManagers().stream().filter(cardManager -> cardManager.getManager()==receiver).toList().isEmpty()) throw new QueensTrelloException(ErrorCode.NOT_CARD_MANAGER);
+        String slackUrl = receiver.getSlackUrl();
+        Classification classification = Classification.Comment;
+        String title = classification.getTitle();
+        String message = card.getTitle() +"카드에 "+comment.getUser().getNickname()+"님이 댓글을 다셨습니다.";
+        try {
+            slackClient.send(slackUrl, payload(p -> p
+                    .text(title) // 메시지 제목
+                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
+                    .username("queens-trello")
+                    .attachments(List.of(
+                            Attachment.builder()
+                                    .color(Color.GREEN.getCode()) // 메시지 색상
+                                    .pretext(message)// 메시지 본문 내용
+                                    .fields(List.of(
+                                            new Field("From."+comment.getUser().getNickname(), comment.getContent(), false)
+                                    ))
                                     .build())))
             );
         } catch (IOException e) {
