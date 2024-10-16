@@ -64,4 +64,14 @@ public class SlackController {
         }
         return "success";
     }
+    @PostMapping("/member/{userId}/{memberId}")
+    public String addMember(@PathVariable Long userId, @PathVariable Long memberId) {
+        try {
+            slackService.addMember(userId, memberId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+        return "success";
+    }
 }

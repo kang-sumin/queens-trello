@@ -106,7 +106,6 @@ public class SlackService {
                                     .color(Color.GREEN.getCode()) // 메시지 색상
                                     .pretext(message)// 메시지 본문 내용
                                     .text("<"+moveUrl+"|"+workspace.getName()+"> \n" +workspace.getDescription())
-
                                     .build())))
             );
         } catch (IOException e) {
@@ -114,8 +113,31 @@ public class SlackService {
         }
     }
 
+
+    public void addMember(Long userId, Long memberId) {
+        User receiver = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        String slackUrl = receiver.getSlackUrl();
+        Classification classification = Classification.Member;
+        String title = classification.getTitle();
+        User member = userRepository.findById(memberId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        String message = "우리 워크스페이스에 "+ member.getNickname()+"님이 오셨어요! 어서 와서 환영해주세요!";
+        try {
+            slackClient.send(slackUrl, payload(p -> p
+                    .text(title) // 메시지 제목
+                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
+                    .username("queens-trello")
+                    .attachments(List.of(
+                            Attachment.builder()
+                                    .color(Color.GREEN.getCode()) // 메시지 색상
+                                    .pretext(message)// 메시지 본문 내용
+                                    .build())))
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
     private String combineAddress() {
         return protocol+"://" + ip + ":" + port;
     }
-
 }
