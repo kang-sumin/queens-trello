@@ -8,9 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +16,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class WorkspaceAdminController {
 
     private final WorkspaceAdminService workspaceAdminService;
+
+    // Master로 권한 변경
+    @PatchMapping("/users/{userId}")
+    public ResponseEntity<String> updateUserRole(
+            @PathVariable("userId") Long userId,
+            @AuthenticationPrincipal AuthUser authUser
+    ){
+        return ResponseEntity.ok(workspaceAdminService.updateUserRole(userId, authUser));
+    }
+
+    // Member 권한 변경
+
 
     // 승인되지 않은 Master 권한 변경 요청 내역 조회 (다건 조회)
     @GetMapping("/master-request")

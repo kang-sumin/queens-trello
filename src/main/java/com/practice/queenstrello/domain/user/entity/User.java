@@ -68,4 +68,8 @@ public class User extends CreatedTimestamped {
         this.nickname = nickname;
         this.userRole = userRole;
     }
+
+    public void updateRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
 }
