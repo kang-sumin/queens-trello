@@ -24,7 +24,10 @@ public enum ErrorCode {
 
 
     // Board Errorcode
-
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 보드를 찾을 수 없습니다."),
+    INVALID_AUTHORITY_UPDATE(HttpStatus.NOT_ACCEPTABLE, "보드를 수정 할 권한이 없습니다."),
+    INVALID_AUTHORITY_DELETE(HttpStatus.NOT_ACCEPTABLE,"보드를 삭제 할 권한이 없습니다."),
+    INVALID_AUTHORITY_CREATE(HttpStatus.NOT_ACCEPTABLE,"보드를 생성 할 권한이 없습니다."),
 
     // List Errorcode
 

@@ -10,8 +10,4 @@ public class QueensTrelloException extends RuntimeException {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
-
-    public QueensTrelloException(String message) {
-        super(message);
-    }
 }
