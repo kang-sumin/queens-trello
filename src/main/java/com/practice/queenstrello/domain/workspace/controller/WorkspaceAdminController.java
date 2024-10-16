@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.workspace.controller;
 
 import com.practice.queenstrello.domain.auth.AuthUser;
+import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceMemberRequest;
 import com.practice.queenstrello.domain.workspace.dto.response.MasterRequestResponse;
 import com.practice.queenstrello.domain.workspace.service.WorkspaceAdminService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,14 @@ public class WorkspaceAdminController {
     }
 
     // Member 권한 변경
+    @PatchMapping("workspace/{workspaceId}/member-users/{userId}")
+    public ResponseEntity<String> updateMemberRole(
+            @PathVariable("workspaceId") Long workspaceId,
+            @PathVariable("userId") Long userId,
+            @RequestBody WorkspaceMemberRequest workspaceMemberRequest
+    ){
+        return ResponseEntity.ok(workspaceAdminService.updateMemberRole(workspaceId, userId, workspaceMemberRequest));
+    }
 
 
     // 승인되지 않은 Master 권한 변경 요청 내역 조회 (다건 조회)

@@ -13,6 +13,7 @@ import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
+import com.practice.queenstrello.domain.workspace.repository.WorkspaceMemberRepository;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
@@ -29,6 +30,7 @@ import java.util.List;
 public class BoardListService{
     private final BoardListRepository boardListRepository;
     private final BoardRepository boardRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
 
     public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest, AuthUser authUser, Long boardId) {
 
@@ -40,13 +42,15 @@ public class BoardListService{
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
 
-        //보드가 존재하면 해당 보드가 속해있는 워크스페이스의 아이디 값을 받아와서 그 아이디로 멤버가 멤버의 역할을 조회할수있음
-
-
         //워크스페이스의 아이디와 현재 접속해있는 사용자 아이디로 현재 사용자의 워크스페이스 멤버 권한을 확인할수있다
+        //보드가 존재하면 해당 보드가 속해있는 워크스페이스의 아이디 값을 받아와서 그 아이디로 멤버가 멤버의 역할을 조회할수있음
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), board.getWorkspace().getId())
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
 
         //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
-
+        if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+        }
 
         BoardList boardList = new BoardList(
                 boardListSaveRequest.getTitle(),
