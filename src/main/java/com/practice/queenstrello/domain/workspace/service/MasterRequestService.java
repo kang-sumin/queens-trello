@@ -41,9 +41,8 @@ public class MasterRequestService {
         );
         masterRequestRepository.save(newMasterRequest);
 
-        String responseMessage = String.format("%s 님의 MASTER 권한 변경 요청이 정상적으로 신청되었습니다.", requestUser.getNickname());
 
-        return responseMessage;
+        return String.format("%s 님의 MASTER 권한 변경 요청이 정상적으로 신청되었습니다.", requestUser.getNickname());
     }
 
 
