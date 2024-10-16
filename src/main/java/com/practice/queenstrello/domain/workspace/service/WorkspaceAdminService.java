@@ -29,8 +29,12 @@ public class WorkspaceAdminService {
     public String updateUserRole(Long userId, AuthUser authUser) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
-        user.updateRole(UserRole.of("ROLE_MASTER"));
 
+        MasterRequest masterRequest = masterRequestRepository.findByRequestUserId(userId)
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.MASTER_REQUEST_NOT_FOUND));
+
+        user.updateRole(UserRole.of("ROLE_MASTER"));
+        masterRequest.updateIsAccepted(true);
 
         return String.format("%s 님의 권한이 %s로 정상적으로 변경되었습니다.", user.getNickname(), user.getUserRole());
     }

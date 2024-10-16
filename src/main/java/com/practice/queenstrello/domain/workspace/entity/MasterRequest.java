@@ -30,4 +30,8 @@ public class MasterRequest extends CreatedTimestamped {
         this.isAccepted = isAccepted;
         this.requestUser = requestUser;
     }
+
+    public void updateIsAccepted(Boolean isAccepted) {
+        this.isAccepted = isAccepted;
+    }
 }
