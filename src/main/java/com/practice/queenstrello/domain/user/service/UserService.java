@@ -19,7 +19,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final S3Service s3Service;
+
 
     @Transactional
     public void deleteUser(Long userId, String password) {
