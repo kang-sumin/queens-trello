@@ -12,15 +12,25 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호입니다."),
     // User ErrorCode
     INVALID_USER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
-    PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+    PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 하지않습니다."),
+    USER_HAS_NOT_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // Attachment ErrorCode
-
+    ATTACHMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "첨부파일을 찾을 수 없습니다."),
+    FILE_EMPTY(HttpStatus.BAD_REQUEST, "업로드할 파일이 없습니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "파일을 업로드 할 . 없습니다."),
+    CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "카드를 찾을 수 없습니다."),
 
     // MemberRole Errorcode
 
 
     // Workspace Errorcode
+    HAS_NOT_ACCESS_PERMISSION_MASTER_REQUEST(HttpStatus.FORBIDDEN, "Master 변경 요청 권한이 없습니다."),
+    MASTER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Master 요청 내역이 없습니다."),
+    MASTER_REQUEST_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 Master 권한 요청 내역이 존재합니다."),
+    HAS_NOT_ACCESS_PERMISSION(HttpStatus.CONFLICT, "해당 서비스에 접근 권한이 없습니다."),
+    INVALID_MEMBER_ROLE(HttpStatus.UNPROCESSABLE_ENTITY,"유효하지 않은 MemberRole 입니다."),
+    WORKSPACE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 워크스페이스를 찾지 못하였습니다."),
 
 
     // Board Errorcode
@@ -44,16 +54,14 @@ public enum ErrorCode {
     //S 3service Errorcode
     FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 에러입니다."),
 
-
     // ### 아래 코드 위에 ErrorCode 작성해 주세요! ErrorCode 메서드 사이는 ,(컴마)로 구분해 주세요! ###
     NOT_FOUND(HttpStatus.NOT_FOUND, "찾지못했습니다.");
-
 
 
     private final HttpStatus status;
     private final String message;
 
-    ErrorCode(HttpStatus httpStatus, String message){
+    ErrorCode(HttpStatus httpStatus, String message) {
         this.status = httpStatus;
         this.message = message;
     }

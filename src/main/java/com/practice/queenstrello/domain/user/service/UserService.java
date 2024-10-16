@@ -37,11 +37,11 @@ public class UserService {
         user.setIsDeleted(true);//메서드명 변경
 
 }
-    @Transactional
-    public void changeImage(AuthUser authUser, MultipartFile file) {
-        User user = userRepository.findById(authUser.getUserId())
-                .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
-        String uploadImageUrl = s3Service.uploadFile(file);
-        user.changeImage(uploadImageUrl);
-    }
+//    @Transactional
+//    public void changeImage(AuthUser authUser, MultipartFile file) {
+//        User user = userRepository.findById(authUser.getUserId())
+//                .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
+//        String uploadImageUrl = s3Service.uploadFile(file);
+//        user.changeImage(uploadImageUrl);
+//    }
 }

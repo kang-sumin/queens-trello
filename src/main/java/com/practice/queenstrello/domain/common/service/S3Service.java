@@ -1,7 +1,5 @@
 package com.practice.queenstrello.domain.common.service;
 
-
-
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -11,11 +9,9 @@ import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-
 
 @RequiredArgsConstructor
 @Component
@@ -42,4 +38,5 @@ public class S3Service {
             throw new QueensTrelloException(ErrorCode.FILE_UPLOAD_ERROR);
         }
     }
+
 }
