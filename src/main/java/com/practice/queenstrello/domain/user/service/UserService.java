@@ -33,14 +33,9 @@ public class UserService {
         }
 
         // 논리적 삭제 처리 (isDeleted를 true로 설정)
-        user.setIsDeleted(true);
+        user.setIsDeleted(true);//메서드명 변경
         // 사용자 정보를 업데이트
-        userRepository.save(user);
+        userRepository.save(user);//수정
 }
-    @Transactional
-    public void changeImage(AuthUser authUser, MultipartFile file) {
-        User user = userRepository.findById(authUser.getId()).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
-        String uploadImageUrl = s3Service.uploadFile(file);
-        user.changeImage(uploadImageUrl);
-    }
+
 }
