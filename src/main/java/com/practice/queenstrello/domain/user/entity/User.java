@@ -46,4 +46,8 @@ public class User extends CreatedTimestamped {
         this.nickname = nickname;
         this.userRole = userRole;
     }
+
+    public void changeImage(String slackUrl) {
+        this.slackUrl = slackUrl;
+    }
 }

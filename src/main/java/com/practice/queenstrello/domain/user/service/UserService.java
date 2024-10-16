@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.user.service;
 
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +19,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
 
     @Transactional
     public void deleteUser(Long userId, String password) {
@@ -33,6 +36,11 @@ public class UserService {
         user.setIsDeleted(true);
         // 사용자 정보를 업데이트
         userRepository.save(user);
-
 }
+    @Transactional
+    public void changeImage(AuthUser authUser, MultipartFile file) {
+        User user = userRepository.findById(authUser.getId()).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        String uploadImageUrl = s3Service.uploadFile(file);
+        user.changeImage(uploadImageUrl);
+    }
 }

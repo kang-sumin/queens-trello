@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,5 +26,13 @@ public class UserController {
         // 회원 탈퇴 로직을 처리 부분
         userService.deleteUser(authUser.getUserId(), deletionRequest.getPassword());
         return ResponseEntity.ok("회원탈퇴가 완료되었습니다.");
+    }
+
+    @PutMapping("/users/image")
+    public void changeImage(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestPart("file") MultipartFile file
+    ) {
+        userService.changeImage(authUser, file);
     }
 }
