@@ -46,7 +46,7 @@ public class SlackService {
 
 
     /**
-     * 슬랙 메시지 전송
+     * 슬랙 메시지 전송 메서드
      **/
     public void sendMessage(Classification classification, String slackUrl, String title, String message, String content, String fieldTitle, String fieldContent) {
         try {
@@ -104,14 +104,14 @@ public class SlackService {
         String createUrl = combineAddress()+"/workspace";
         String content = "<"+createUrl+"|"+"워크스페이스 생성하기"+">";
 
-        User user = userRepository.findById(userId).orElseThrow(()->new QueensTrelloException(ErrorCode.INVALID_USER));
-        String slackUrl = user.getSlackUrl();
+        User receiver = findUser(userId);
+        String slackUrl = receiver.getSlackUrl();
         sendMessage(classification, slackUrl, title, message, content,null,null);
     }
 
     public void inviteMember(Long inviterId, Long invitedId) {
-        User inviter = userRepository.findById(inviterId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
-        User invited = userRepository.findById(invitedId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        User inviter = findUser(inviterId);
+        User invited = findUser(invitedId);
         String slackUrl = invited.getSlackUrl();
         Classification classification = Classification.Invite;
         String title = inviter.getNickname() + classification.getTitle();
@@ -124,20 +124,20 @@ public class SlackService {
 
 
     public void addMember(Long userId, Long memberId) {
-        User receiver = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        User receiver = findUser(userId);
         String slackUrl = receiver.getSlackUrl();
         Classification classification = Classification.Member;
         String title = classification.getTitle();
-        User member = userRepository.findById(memberId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        User member = findUser(memberId);
         String message = "우리 워크스페이스에 "+ member.getNickname()+"님이 오셨어요! 어서 와서 환영해주세요!";
         sendMessage(classification, slackUrl, title, message,null,null,null);
     }
 
     public void changeCard(Long userId, Long cardId) {
-        User receiver = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        User receiver = findUser(userId);
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
         //card의 매니저인지 확인
-        if(card.getCardManagers().stream().filter(cardManager -> cardManager.getManager()==receiver).toList().isEmpty()) throw new QueensTrelloException(ErrorCode.NOT_CARD_MANAGER);
+        checkManager(card, receiver);
         String slackUrl = receiver.getSlackUrl();
         Classification classification = Classification.Card;
         String title = classification.getTitle();
@@ -146,10 +146,11 @@ public class SlackService {
     }
 
     public void addComment(Long userId, Long commentId) {
-        User receiver = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        User receiver = findUser(userId);
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new QueensTrelloException(ErrorCode.INVALID_COMMENT));
         Card card = comment.getCard();
-        if(card.getCardManagers().stream().filter(cardManager -> cardManager.getManager()==receiver).toList().isEmpty()) throw new QueensTrelloException(ErrorCode.NOT_CARD_MANAGER);
+        //card의 매니저인지 확인
+        checkManager(card, receiver);
         String slackUrl = receiver.getSlackUrl();
         Classification classification = Classification.Comment;
         String title = classification.getTitle();
@@ -159,5 +160,13 @@ public class SlackService {
 
     private String combineAddress() {
         return protocol+"://" + ip + ":" + port;
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+    }
+
+    private void checkManager(Card card, User user) {
+        if(card.getCardManagers().stream().filter(cardManager -> cardManager.getManager()==user).toList().isEmpty()) throw new QueensTrelloException(ErrorCode.NOT_CARD_MANAGER);
     }
 }
