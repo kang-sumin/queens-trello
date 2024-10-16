@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-public interface BoardListRepository extends JpaRepository<BoardList, Long> {
+public interface BoardListRepository extends JpaRepository<BoardList,Long> {
     List<BoardList> findByBoardIdOrderByOrderAsc(Long boardId);
 
     @Modifying

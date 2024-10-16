@@ -6,6 +6,8 @@ import com.practice.queenstrello.domain.board.dto.response.BoardSaveResponse;
 import com.practice.queenstrello.domain.board.entity.Board;
 import com.practice.queenstrello.domain.board.repository.BoardRepository;
 import com.practice.queenstrello.domain.card.entity.Card;
+import com.practice.queenstrello.domain.common.exception.ErrorCode;
+import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +21,21 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BoardService {
     private final BoardRepository boardRepository;
-    //워크스페이스 레파지토리 추가
+    private final WorkspaceRepository workspaceRepository;
 
     @Transactional
     public BoardSaveResponse savedBoard(BoardSaveRequest boardSaveRequest, User user) {
         validateUser(user);// 로그인체크
 
-        Workspace workspace = workspaceRepository.findById(request.getWorkspaceId())
+        Workspace workspace = workspaceRepository.findById(Request.getWorkspaceId())
                 .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));
 
         if (user.isReadOnly()) {
-            throw new PermissionDeniedException("보드를 생성할 권한이 없습니다.");
+            throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_CREATE);
         }
 
         if (boardSaveRequest.getTitle() == null || boardSaveRequest.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("보드 제목은 필수입니다.");
+            throw new QueensTrelloException(ErrorCode.TITLE_ESSENTIAL);
         }
 
         Board newBoard = new Board(
@@ -50,7 +52,7 @@ public class BoardService {
 
     public BoardSaveResponse getBoard(long boardId) {
         Board newBoard = boardRepository.findById(boardId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 보드를 찾을 수 없습니다.") );
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
         return BoardSaveResponse.of(newBoard);
     }
 
@@ -67,9 +69,9 @@ public class BoardService {
     public BoardSaveResponse updateBoard(long boardId, BoardUpdateRequest boardRequest, User user) {
         validateUser(user); //로그인 체크
         Board newBoard = boardRepository.findById(boardId)
-                .orElseThrow(()-> new IllegalArgumentException("해당 보드를 찾을 수 없습니다."));
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
         if (user.isReadOnly()) {
-            throw new PermissionDeniedException("보드를 수정할 권한이 없습니다.");
+            throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_UPDATE);
         }
         if (boardRequest.getTitle() != null) {
             newBoard.changeTitle(boardRequest.getTitle());
@@ -87,7 +89,7 @@ public class BoardService {
     @Transactional
     public void updateBoardWorkspace(long boardId, Long workspaceId) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new QueensTrelloException("워크스페이스를 찾을 수 없습니다."));
         //JPQL 쿼리를 사용해 보드의 워크스페이스 업데이트
         boardRepository.updateWorkspace(boardId, workspaceId);
     };
@@ -96,17 +98,17 @@ public class BoardService {
     public void deleteBoard(long boardId, User user) {
         validateUser(user); //로그인 체크
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 보드를 찾을 수 없습니다."));
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
 
         if (user.isReadOnly()) {
-            throw new PermissionDeniedException("보드를 삭제할 권한이 없습니다.");
+            throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_DELETE);
         }
 
         boardRepository.delete(board);
     }
     private void validateUser(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("로그인이 필요합니다.");
+            throw new QueensTrelloException(ErrorCode.INVALID_USER);
         }
     }
 }

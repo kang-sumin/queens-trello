@@ -1,6 +1,8 @@
 package com.practice.queenstrello.domain.list.service;
 
 import com.practice.queenstrello.domain.board.entity.Board;
+import com.practice.queenstrello.domain.common.exception.ErrorCode;
+import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.list.dto.request.BoardListSaveRequest;
 import com.practice.queenstrello.domain.list.dto.request.BoardListUpdateRequest;
 import com.practice.queenstrello.domain.list.dto.response.BoardListSaveResponse;
@@ -17,13 +19,10 @@ import java.lang.reflect.Member;
 public class BoardListService {
     private final BoardListRepository boardListRepository;
 
-    public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest, Board board, Member member) {
-        validateWritePermission(member);
-
+    public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest) {
         BoardList boardList = new BoardList(
                 boardListSaveRequest.getTitle(),
-                boardListSaveRequest.getOrder(),
-                board
+                boardListSaveRequest.getOrder()
         );
         BoardList savedBoardList = boardListRepository.save(boardList);
         return BoardListSaveResponse.of(savedBoardList);
@@ -31,11 +30,8 @@ public class BoardListService {
 
     @Transactional
     public BoardListSaveResponse updateBoardList(long boardListId, BoardListUpdateRequest boardListUpdateRequest) {
-        validateWritePermission(member);
-
         BoardList boardList = boardListRepository.findById(boardListId)
-                .orElseThrow(() -> new IllegalArgumentException("리스트가 없습니다."));
-
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
         if (boardListUpdateRequest.getTitle() != null) {
             boardList.changeTitle(boardListUpdateRequest.getTitle());
         }
@@ -51,7 +47,7 @@ public class BoardListService {
         validateWritePermission(member);
 
         BoardList boardList = boardListRepository.findById(boardListId)
-                .orElseThrow(() -> new IllegalArgumentException("리스트가 없습니다."));
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
         boardListRepository.delete(boardList);
 
     }

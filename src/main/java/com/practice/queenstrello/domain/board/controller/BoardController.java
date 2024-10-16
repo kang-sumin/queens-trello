@@ -3,8 +3,8 @@ package com.practice.queenstrello.domain.board.controller;
 import com.practice.queenstrello.domain.board.dto.request.BoardSaveRequest;
 import com.practice.queenstrello.domain.board.dto.request.BoardUpdateRequest;
 import com.practice.queenstrello.domain.board.dto.response.BoardSaveResponse;
-import com.practice.queenstrello.domain.board.dto.response.BoardUpdateResponse;
 import com.practice.queenstrello.domain.board.service.BoardService;
+import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,7 +50,7 @@ public class BoardController {
         try {
             BoardSaveResponse boardResponse = boardService.updateBoard(boardId, boardUpdateRequest, user);
             return ResponseEntity.ok(boardResponse);
-        } catch (PermissionDeniedException e) {
+        } catch (QueensTrelloException Q) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
     }
@@ -64,7 +64,7 @@ public class BoardController {
         try {
             boardService.deleteBoard(boardId, user);
             return ResponseEntity.noContent().build();
-        } catch (PermissionDeniedException e) {
+        } catch (QueensTrelloException Q) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
