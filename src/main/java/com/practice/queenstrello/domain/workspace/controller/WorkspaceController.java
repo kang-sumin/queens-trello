@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.workspace.controller;
 
 import com.practice.queenstrello.domain.auth.AuthUser;
+import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceMemberEmailRequest;
 import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceSaveRequest;
 import com.practice.queenstrello.domain.workspace.dto.response.WorkspaceResponse;
 import com.practice.queenstrello.domain.workspace.service.WorkspaceService;
@@ -8,12 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class WorkspaceController {
 
@@ -26,6 +24,16 @@ public class WorkspaceController {
             @RequestBody WorkspaceSaveRequest workspaceSaveRequest
     ){
         return ResponseEntity.ok(workspaceService.saveWorkspace(authUser, workspaceSaveRequest));
+    }
+
+    // 워크 스페이스에 멤버 초대
+    @PostMapping("/workspace/{workspaceId}/member")
+    public ResponseEntity<String> addMember(
+            @PathVariable("workspaceId") Long workspaceId,
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody WorkspaceMemberEmailRequest workspaceMemberEmailRequest
+            ){
+        return ResponseEntity.ok(workspaceService.addMember(workspaceId, authUser, workspaceMemberEmailRequest));
     }
 
 }

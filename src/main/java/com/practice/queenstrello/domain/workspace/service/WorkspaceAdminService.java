@@ -27,6 +27,9 @@ public class WorkspaceAdminService {
     // Master로 권한 변경
     @Transactional
     public String updateUserRole(Long userId, AuthUser authUser) {
+
+        // todo : 변경하려는 User권한이 ROLE_USER인지 확인하여 예외 처리 하기
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
