@@ -38,7 +38,8 @@ public enum ErrorCode {
 
 
     // Card Errorcode
-
+    INVALID_CARD(HttpStatus.BAD_REQUEST,"유효하지 않은 cardId 입니다."),
+    NOT_CARD_MANAGER(HttpStatus.BAD_REQUEST,"해당 카드의 매니저가 아닙니다."),
 
     // Comment Errorcode
 

@@ -1,6 +1,8 @@
 package com.practice.queenstrello.domain.notify.service;
 
 import com.practice.queenstrello.config.Color;
+import com.practice.queenstrello.domain.card.entity.Card;
+import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.notify.entity.Classification;
@@ -10,6 +12,7 @@ import com.practice.queenstrello.domain.workspace.entity.Workspace;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceRepository;
 import com.slack.api.Slack;
 import com.slack.api.model.Attachment;
+import com.slack.api.model.Field;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,10 +37,10 @@ public class SlackService {
 
     private final UserRepository userRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final CardRepository cardRepository;
 
     private final Slack slackClient = Slack.getInstance();
 
-//    private String uriAddress = protocol+"://" + ip + ":" + port + "/";
 
     /**
      * 슬랙 메시지 전송
@@ -137,6 +140,35 @@ public class SlackService {
         }
 
     }
+
+    public void changeCard(Long userId, Long cardId) {
+        User receiver = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+        Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
+        //card의 매니저인지 확인
+        if(card.getCardManagers().stream().filter(cardManager -> cardManager.getManager()==receiver).toList().isEmpty()) throw new QueensTrelloException(ErrorCode.NOT_CARD_MANAGER);
+        String slackUrl = receiver.getSlackUrl();
+        Classification classification = Classification.Card;
+        String title = classification.getTitle();
+        String message = card.getTitle()+" 카드 내용을 꼼꼼히 확인하세요!";
+        try {
+            slackClient.send(slackUrl, payload(p -> p
+                    .text(title) // 메시지 제목
+                    .iconUrl("https://raw.githubusercontent.com/kang-sumin/queens-trello/refs/heads/feat/search/src/main/resources/static/img/queens-icon.webp")
+                    .username("queens-trello")
+                    .attachments(List.of(
+                            Attachment.builder()
+                                    .color(Color.GREEN.getCode()) // 메시지 색상
+                                    .pretext(message)// 메시지 본문 내용
+                                     .fields(List.of(
+                                             new Field(card.getTitle(), card.getContent(), false)
+                                     ))
+                                    .build())))
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private String combineAddress() {
         return protocol+"://" + ip + ":" + port;
     }

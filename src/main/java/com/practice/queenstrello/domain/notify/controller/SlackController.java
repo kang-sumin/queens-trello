@@ -17,14 +17,14 @@ public class SlackController {
     /**
      * 기본 메세지 전송 test
      * @param authUser : 로그인된 회원정보
-     * @param request : 메세지 내용
-     * @return
+     * @param request  : 메세지 내용
+     * @return  성공여부
      */
 
     @PostMapping("/send")
     public String sendMessage(@AuthenticationPrincipal AuthUser authUser, @RequestBody @Valid SlackMessageRequest request) {
         try {
-            slackService.sendMessage(authUser.getUserId(),request.getTitle(), request.getMessage());
+            slackService.sendMessage(authUser.getUserId(), request.getTitle(), request.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";
@@ -34,6 +34,7 @@ public class SlackController {
 
     /**
      * 마스터 권한 힉득 메세지
+     *
      * @param userId : 알림을 받을 유저 ID
      * @return 성공여부
      */
@@ -49,9 +50,8 @@ public class SlackController {
     }
 
     /**
-     * 
-     * @param inviterId  초대한 유저ID
-     * @param invitedId  초대받은 유저 ID
+     * @param inviterId 초대한 유저ID
+     * @param invitedId 초대받은 유저 ID
      * @return 성공 여부
      */
     @PostMapping("/invite/{inviterId}/{invitedId}")
@@ -64,6 +64,7 @@ public class SlackController {
         }
         return "success";
     }
+
     @PostMapping("/member/{userId}/{memberId}")
     public String addMember(@PathVariable Long userId, @PathVariable Long memberId) {
         try {
@@ -74,4 +75,16 @@ public class SlackController {
         }
         return "success";
     }
+
+    @PostMapping("/card/{userId}/{cardId}")
+    public String changeCard(@PathVariable Long userId, @PathVariable Long cardId) {
+        try {
+            slackService.changeCard(userId, cardId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "fail";
+        }
+        return "success";
+    }
+
 }
