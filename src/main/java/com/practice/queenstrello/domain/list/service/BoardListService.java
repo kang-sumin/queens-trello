@@ -9,9 +9,13 @@ import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
+import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,13 +56,28 @@ public class BoardListService {
 
         BoardList boardList = boardListRepository.findById(boardListId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
+        //보드 리스트 삭제
         boardListRepository.delete(boardList);
+        //권한 검증
+        Long boardId = boardList.getBoard().getId();
+        int deletedOrder = boardList.getOrder();
 
+        //순서가 큰 boardList 가져오기
+        List<BoardList> listsToUpdate = boardListRepository.findByBoardIdAndOrderGreaterThan(boardId, deletedOrder);
+
+        //order값 하나씩 감소시키기
+        for (BoardList list : listsToUpdate) {
+            list.setOrder(list.getOrder() - 1);
+        }
+
+        //변경된 BoardList 저장
+        boardListRepository.saveAll(listsToUpdate);
+    }
     }
 
     //쓰기 권한 검증 -> 다 필요!
     private void validateWritePermission(WorkspaceMember member) {
-        if (member.getRole() == Role.READ_ONLY) {
+        if (member == null || !member.hasWritePermission()) {
             throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
 
         }

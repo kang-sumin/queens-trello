@@ -7,6 +7,7 @@ import com.practice.queenstrello.domain.board.entity.Board;
 import com.practice.queenstrello.domain.board.repository.BoardRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.practice.queenstrello.domain.board.entity.QBoard.board;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +28,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final BoardListRepository boardListRepository;
 
     @Transactional
     public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, User user) {

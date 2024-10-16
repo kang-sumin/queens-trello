@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface BoardListRepository extends JpaRepository<BoardList,Long> {
-    List<BoardList> findByBoardIdOrderByOrderAsc(Long boardId);
+    List<BoardList> findByBoardIdAndOrderGreaterThan(Long boardId, Integer order);
 
     @Modifying
     @Transactional
