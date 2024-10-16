@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+
+//저장할 때나 순서 바뀔때 정렬 생각해야된다. Validation 이용할 것
 public class BoardListService {
     private final BoardListRepository boardListRepository;
 
@@ -41,6 +43,7 @@ public class BoardListService {
     }
 
     @Transactional
+    //삭제를 했으면 뒤에 있던 애 처리 로직 필요
     public void deleteBoardList(long boardListId, WorkspaceMember member) {
         validateWritePermission(member);
 
@@ -50,10 +53,10 @@ public class BoardListService {
 
     }
 
-    //쓰기 권한 검증
+    //쓰기 권한 검증 -> 다 필요!
     private void validateWritePermission(WorkspaceMember member) {
         if (member.getRole() == Role.READ_ONLY) {
-            throw new PermissionDeniedException("읽기 전용 멤버는 이 작업을 수행할 수 없습니다.");
+            throw new QueensTrelloException("읽기 전용 멤버는 이 작업을 수행할 수 없습니다.");
 
         }
     }

@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name="boards")
 public class Board extends ModifiedTimestamped {
-
+    //name 부분 삭제 필요 다른 분들이랑 맞출것
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="board_id")

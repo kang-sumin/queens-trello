@@ -24,7 +24,7 @@ public class BoardSaveResponse {
     private List<Card> cards; //카드 응답 추가
 
     public static BoardSaveResponse of(Board board) {
-        //Board의 BoardList에서 Card를 수집
+        //Board의 BoardList에서 Card를 수집, List가 빠져있어서 보드 안, 리스트 안, 카드 안 ->계층 구조화
         List<Card> cards = board.getBoardLists().stream()
                 .flatMap(boardList -> boardList.getCards().stream())
                 .collect(Collectors.toList());//모든 카드 수집

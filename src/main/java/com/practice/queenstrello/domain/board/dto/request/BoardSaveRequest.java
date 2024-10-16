@@ -1,10 +1,11 @@
 package com.practice.queenstrello.domain.board.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
 public class BoardSaveRequest {
-    private Long id;
+    @NotBlank
     private String title;
     private String backgroundColor;
     private String imageUrl;
