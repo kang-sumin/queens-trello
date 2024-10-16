@@ -20,6 +20,7 @@ public class BoardListService {
     private final BoardListRepository boardListRepository;
 
     public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest) {
+        validateUser(user);
         BoardList boardList = new BoardList(
                 boardListSaveRequest.getTitle(),
                 boardListSaveRequest.getOrder()

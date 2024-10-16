@@ -57,6 +57,13 @@ public class Board extends ModifiedTimestamped {
         this.workspace = workspace;
     }
 
+    public Board(String title, String backgroundColor, String imageUrl, Workspace workspace) {
+        this.title = title;
+        this.backgroundColor = backgroundColor;
+        this.imageUrl = imageUrl;
+        this.workspace = workspace;
+    }
+
     public void changeTitle(String title) {
         if (title != null && !title.isEmpty()) {
             this.title = title;

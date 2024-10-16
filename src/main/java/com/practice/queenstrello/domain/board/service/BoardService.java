@@ -26,7 +26,7 @@ public class BoardService {
 
     @Transactional
     public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, User user) {
-        validateUser(user);// 로그인체크, 코드 컨벤션 맞추기
+        validateWorkspaceMember(user);// 로그인체크, 코드 컨벤션 맞추기
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));// 에러 코드 개선
@@ -66,7 +66,7 @@ public class BoardService {
 
     @Transactional
     public BoardSaveResponse updateBoard(long boardId, BoardUpdateRequest boardRequest, User user) {
-        validateUser(user); //로그인 체크
+        validateWorkspaceMember(user); //로그인 체크
         Board newBoard = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
         if (user.isReadOnly()) {
@@ -86,7 +86,7 @@ public class BoardService {
 
     @Transactional
     public void deleteBoard(long boardId, User user) {
-        validateUser(user); //로그인 체크
+        validateWorkspaceMember(user); //로그인 체크
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
     //Workspace 레파지토리 체크
@@ -97,8 +97,8 @@ public class BoardService {
         boardRepository.delete(board);
     }
 
-    //validateWorkspaceMember로 변경
-    private void validateUser(User user) {
+    //validateWorkspaceMember로 변경 v
+    private void validateWorkspaceMember(User user) {
         if (user == null) {
             throw new QueensTrelloException(ErrorCode.INVALID_USER);
         }
