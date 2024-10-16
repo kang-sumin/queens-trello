@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.board.service;
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.board.dto.request.BoardSaveRequest;
 import com.practice.queenstrello.domain.board.dto.request.BoardUpdateRequest;
 import com.practice.queenstrello.domain.board.dto.response.BoardSaveResponse;
@@ -7,7 +8,6 @@ import com.practice.queenstrello.domain.board.entity.Board;
 import com.practice.queenstrello.domain.board.repository.BoardRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
-import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
@@ -28,13 +28,15 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final BoardListRepository boardListRepository;
+    private final AuthUser authUser;
 
     @Transactional
     public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, User user) {
 
+        User requestUser = User.fromAuthUser(authUser);
+
         Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));// 에러 코드 개선
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
 
         boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(user.getId(), workspaceId, MemberRole.READ);
         //메서드로 묶고 public 처리 ,Global Exception 처리
@@ -63,7 +65,7 @@ public class BoardService {
 
     public List<BoardSaveResponse> getBoards(Long workspaceId) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
         List<Board> boardList = boardRepository.findByWorkspaceId(workspaceId);
         //각 board에 속한 card들을 가져와 매핑, 나중에 개선 !!!
         return boardList.stream()

@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.list.controller;
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.list.dto.request.BoardListSaveRequest;
 import com.practice.queenstrello.domain.list.dto.request.BoardListUpdateRequest;
 import com.practice.queenstrello.domain.list.dto.response.BoardListSaveResponse;
@@ -7,17 +8,18 @@ import com.practice.queenstrello.domain.list.service.BoardListService;
 import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/lists")
+@RequestMapping("/{boardId}/lists")
 @RestController
 @RequiredArgsConstructor
 public class BoardListController {
     private final BoardListService boardListService;
 
     @PostMapping
-    public ResponseEntity<BoardListSaveResponse> savedBoardList (@RequestBody BoardListSaveRequest boardListSaveRequest) {
-        BoardListSaveResponse boardListSaveResponse =  boardListService.savedBoardList(boardListSaveRequest, new WorkspaceMember());
+    public ResponseEntity<BoardListSaveResponse> savedBoardList (@RequestBody BoardListSaveRequest boardListSaveRequest, @AuthenticationPrincipal AuthUser authUser, @PathVariable("boardId") Long boardId) {
+        BoardListSaveResponse boardListSaveResponse =  boardListService.savedBoardList(boardListSaveRequest, authUser, boardId);
         return ResponseEntity.ok(boardListSaveResponse);
     }
 
