@@ -8,6 +8,7 @@ import com.practice.queenstrello.domain.list.dto.response.BoardListSaveResponse;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
+import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
 import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 
 //저장할 때나 순서 바뀔때 정렬 생각해야된다. Validation 이용할 것
-public class BoardListService {
+public class BoardListService{
     private final BoardListRepository boardListRepository;
 
     public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest, WorkspaceMember member) {
@@ -73,13 +74,13 @@ public class BoardListService {
         //변경된 BoardList 저장
         boardListRepository.saveAll(listsToUpdate);
     }
-    }
 
     //쓰기 권한 검증 -> 다 필요!
     private void validateWritePermission(WorkspaceMember member) {
-        if (member == null || !member.hasWritePermission()) {
+        if (member == null || member.getMemberRole() == MemberRole.READ) {
             throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
 
         }
     }
 }
+
