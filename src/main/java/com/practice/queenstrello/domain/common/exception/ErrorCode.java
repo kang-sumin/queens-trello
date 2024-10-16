@@ -30,7 +30,7 @@ public enum ErrorCode {
     INVALID_AUTHORITY_CREATE(HttpStatus.NOT_ACCEPTABLE,"보드를 생성 할 권한이 없습니다."),
 
     // List Errorcode
-
+    LIST_NOT_FOUND(HttpStatus.NOT_FOUND,"리스트가 없습니다."),
 
     // Card Errorcode
 
