@@ -51,7 +51,6 @@ public class BoardListService{
     }
 
     @Transactional
-    //삭제를 했으면 뒤에 있던 애 처리 로직 필요
     public void deleteBoardList(long boardListId, WorkspaceMember member) {
         validateWritePermission(member);
 
