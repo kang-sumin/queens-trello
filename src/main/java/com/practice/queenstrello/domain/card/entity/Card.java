@@ -31,7 +31,7 @@ public class Card extends CreatedTimestamped {
     private String content;
 
     @Column(name="card_deadline", nullable=false)
-    private LocalDateTime deadLine;
+    private LocalDateTime deadLine; //
 
     @OneToMany(mappedBy = "card")
     private List<Comment> comments = new ArrayList<>();

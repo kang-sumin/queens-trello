@@ -29,7 +29,7 @@ public class CommentService {
     @Transactional
     public CommentSaveResponse saveComment(CommentSaveRequest commentSaveRequest , Long cardId, Long userId) {
 
-        //댓글 작성자 확인
+        //댓글 작성자 확인 워크스페이스멤버
         User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
         //읽기 전용 사용자 예외처리
@@ -50,7 +50,7 @@ public class CommentService {
 
     }
 
-    //댓글 수정
+    //댓글 수정 남이 못하게 수정도~
     @Transactional
     public CommentUpdateResponse updateComment(CommentUpdateRequest commentUpdateRequest, Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(()-> new QueensTrelloException(ErrorCode.INVALID_COMMENT));

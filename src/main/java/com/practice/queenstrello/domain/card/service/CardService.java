@@ -20,6 +20,7 @@ import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,7 +48,7 @@ public class CardService {
         //카드생성자 확인
         User creator = userRepository.findById(creatorId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
-        //읽기전용이면 예외처리
+        //읽기전용이면 예외처리-user에서 찾는게 아니라 워크스페이스 내에서 파티원들을 구분지어야한다. ㅜ어크스페이스 멤버 리포지토리
         if (creator.getUserRole().equals(UserRole.ROLE_USER)) {
             throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
         }
@@ -70,9 +72,9 @@ public class CardService {
             CardManager cardManager = new CardManager(card, manager);
             card.addCardManager(cardManager);
             cardManagerRepository.save(cardManager);
-        }
+        } //saveall메소드 고려 매니저id검증도 생각해야함 id를 IN으로
 
-        // ID로 담당자 리스트 반환
+        // ID로 담당자 리스트 반환 + 첨부내용 카드에는 첨부파일이 들어간다. 로그기록 기능을 고려해보자
         List<Long> managerIds = managers.stream()
                 .map(User::getId)
                 .toList();
@@ -87,7 +89,7 @@ public class CardService {
     //카드 다건 조회
     public Page<CardSimpleResponse> getCards(Long listId, int page, int size) {
         Pageable pagealbe = PageRequest.of(page, size);
-        Page<Card> cards = cardRepository.findByListIdWithManagers(listId, pagealbe);
+        Page<Card> cards = cardRepository.findByListIdWithManagers(listId, pagealbe); //한번 빼고 되나
 
         return cards.map(card -> new CardSimpleResponse(
                 card.getTitle(),
@@ -100,12 +102,12 @@ public class CardService {
         ));
     }
 
-    //카드 단건(상세) 조회
+    //카드 단건(상세) 조회 워크스페이스 멤버인지 확인해야함
     public CardDetailResponse getCard(long cardId) {
         //카드정보 조회
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException((ErrorCode.INVALID_CARD)));
 
-        //카드 정보와 담당자 목록 리스폰스하기
+        //카드 정보와 담당자 목록 리스폰스하기 + 댓글도 +첨부파일
         return new CardDetailResponse(
                 card.getTitle(),
                 card.getContent(),
@@ -116,7 +118,7 @@ public class CardService {
                 card.getComments().stream()
                         .map(comment -> new CommentSaveResponse(comment.getId(), comment.getContent(), comment.getUser().getId(), comment.getCreatedAt()))
                         .toList()
-        );
+        ); //of 나 builder 쓰면 간결해짐
     }
 
     //카드 수정
@@ -143,7 +145,7 @@ public class CardService {
             cardLogService.saveLog(user,card,logMessage);
         } catch (Exception e) {
             //로그 저장 중 예외 발생해도, 로그만 별도 트랜잭션으로 구현했으니 수정과 별개로 처리해야한다.
-            System.out.println("로그 저장 중 에러가 발생했습니다." + e.getMessage());
+            System.out.println("로그 저장 중 에러가 발생했습니다." + e.getMessage()); //log.error로 수정
         }
 
 
@@ -155,16 +157,16 @@ public class CardService {
         List<CardManager> existingManagers = cardManagerRepository.findByCardId(cardId);
         // 2. 요청에서 들어온 담당자 ID 리스트
         List<Long> newManagerIds = cardUpdateRequest.getManagerIds();
-        // 3. 기존 담당자 중에서 제거할 담당자들 삭제
+        // 3. 기존 담당자 중에서 제거할 담당자들 삭제 ->IN절
         for (CardManager existingManager : existingManagers) {
             if (!newManagerIds.contains(existingManager.getManager().getId())) {
                 cardManagerRepository.deleteByCardIdAndManagerId(cardId, existingManager.getManager().getId());
             }
         }
-        // 4. 새로 추가할 담당자 추가
+        // 4. 새로 추가할 담당자 추가 saveall
         List<User> newManagers = userRepository.findAllById(newManagerIds);
         for (User manager : newManagers) {
-            //이미 등록된 담당자가 아닐 때 추가하게끔 조건 걸기
+            //이미 등록된 담당자가 아닐 때에 비로소 추가하게끔 조건 걸기. 먼저 리스트를 "비교"하고, 있는건 두고 없어진 목록들만 따로 날리고 새로운것들 넣고
             if (existingManagers.stream().noneMatch(cardManager -> cardManager.getManager().getId().equals(manager.getId()))) {
                 CardManager newCardManager = new CardManager(card, manager);
                 card.addCardManager(newCardManager);
@@ -197,7 +199,7 @@ public class CardService {
         if (user.getUserRole().equals(UserRole.ROLE_USER)) {
             throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
         }
-        //카드에 연결된 데이터(카드 매니저, 댓글..) 삭제
+        //카드에 연결된 데이터(카드 매니저, 댓글..) 삭제 ->cascade ,카드 날리기 전에 s3에 직접 첨부파일 삭제요청을 날리는 메서드
         cardManagerRepository.deleteByCardId(cardId); //담당자 삭제
         commentRepository.deleteByCardId(cardId); //댓글 삭제
 
