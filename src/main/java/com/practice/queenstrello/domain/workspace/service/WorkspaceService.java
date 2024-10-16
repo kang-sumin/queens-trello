@@ -7,8 +7,9 @@ import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceMemberEmailRequest;
-import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceSaveRequest;
+import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceRequest;
 import com.practice.queenstrello.domain.workspace.dto.response.WorkspaceResponse;
+import com.practice.queenstrello.domain.workspace.dto.response.WorkspaceUpdateResponse;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
 import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
@@ -17,8 +18,6 @@ import com.practice.queenstrello.domain.workspace.repository.WorkspaceRepository
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +30,7 @@ public class WorkspaceService {
 
     // 워크 스페이스 생성
     @Transactional
-    public WorkspaceResponse saveWorkspace(AuthUser authUser, WorkspaceSaveRequest workspaceSaveRequest) {
+    public WorkspaceResponse saveWorkspace(AuthUser authUser, WorkspaceRequest workspaceRequest) {
 
         User user = User.fromAuthUser(authUser);
 
@@ -41,8 +40,8 @@ public class WorkspaceService {
         }
 
         Workspace newWorkspace = new Workspace(
-                workspaceSaveRequest.getName(),
-                workspaceSaveRequest.getDescription(),
+                workspaceRequest.getName(),
+                workspaceRequest.getDescription(),
                 user
         );
         Workspace savedWorkspace = workspaceRepository.save(newWorkspace);
@@ -69,13 +68,14 @@ public class WorkspaceService {
             throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
         }
 
+        // 초대하고자 하는 워크스페이스 검색
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+
         // 이메일을 사용하여 사용자 검색
         User inviteMember = userRepository.findByEmail(workspaceMemberEmailRequest.getEmail())
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
-        // 초대하고자 하는 워크스페이스 검색
-        Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
 
         // 사용자를 워크스페이스 멤버로 추가
         WorkspaceMember newWorkspaceMember = new WorkspaceMember(
@@ -87,4 +87,43 @@ public class WorkspaceService {
 
         return String.format("%s 님을 %s 워크스페이스의 멤버로 초대하였습니다.", inviteMember.getNickname(), workspace.getName());
     }
+
+    // 워크 스페이스 수정
+    @Transactional
+    public WorkspaceUpdateResponse updateWorkspace(Long workspaceId, AuthUser authUser, WorkspaceRequest workspaceRequest) {
+
+        // 서비스 권한 확인
+        User user = checkPermission(authUser, workspaceId);
+
+        // 수정하고자 하는 워크스페이스 검색
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+
+        workspace.update(workspaceRequest);
+
+        return new WorkspaceUpdateResponse(
+                workspace.getId(),
+                workspace.getName(),
+                workspace.getDescription(),
+                workspace.getCreatedAt(),
+                workspace.getModifiedAt(),
+                workspace.getMasterUser(),
+                workspace.getCreateUser(),
+                user
+        );
+    }
+
+    // 워크스페이스 서비스 권한 확인
+    private User checkPermission(AuthUser authUser, Long workspaceId) {
+        // 로그인한 사용자
+        User user = User.fromAuthUser(authUser);
+
+        // 로그인 사용자가 USER 권한 일때 MemberRole이 WORKSPACE가 아닐때 예외 처리
+        if (user.getUserRole().equals(UserRole.ROLE_USER) && !(workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(authUser.getUserId(), workspaceId, MemberRole.WORKSPACE))){
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+        }
+
+        return user;
+    }
+
 }
