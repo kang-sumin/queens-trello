@@ -7,6 +7,7 @@ import com.practice.queenstrello.domain.list.dto.request.BoardListUpdateRequest;
 import com.practice.queenstrello.domain.list.dto.response.BoardListSaveResponse;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
+import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class BoardListService {
     private final BoardListRepository boardListRepository;
 
-    public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest) {
-        validateUser(user);
+    public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest, WorkspaceMember member) {
+        validateWritePermission(member);
         BoardList boardList = new BoardList(
                 boardListSaveRequest.getTitle(),
                 boardListSaveRequest.getOrder()
@@ -30,7 +31,8 @@ public class BoardListService {
     }
 
     @Transactional
-    public BoardListSaveResponse updateBoardList(long boardListId, BoardListUpdateRequest boardListUpdateRequest) {
+    public BoardListSaveResponse updateBoardList(long boardListId, BoardListUpdateRequest boardListUpdateRequest, WorkspaceMember member) {
+        validateWritePermission(member);
         BoardList boardList = boardListRepository.findById(boardListId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
         if (boardListUpdateRequest.getTitle() != null) {
@@ -57,7 +59,7 @@ public class BoardListService {
     //쓰기 권한 검증 -> 다 필요!
     private void validateWritePermission(WorkspaceMember member) {
         if (member.getRole() == Role.READ_ONLY) {
-            throw new QueensTrelloException("읽기 전용 멤버는 이 작업을 수행할 수 없습니다.");
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
 
         }
     }

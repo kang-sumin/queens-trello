@@ -39,6 +39,7 @@ public enum ErrorCode {
 
     // List Errorcode
     BOARDLIST_NOT_FOUND(HttpStatus.NOT_FOUND,"리스트가 없습니다."),
+    HAS_NOT_ACCESS_PERMISSION_READ(HttpStatus.CONFLICT,"읽기 전용 멤버는 이 작업을 수행할 수 없습니다."),
 
     // Card Errorcode
 

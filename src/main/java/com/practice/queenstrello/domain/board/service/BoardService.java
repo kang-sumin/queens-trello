@@ -8,7 +8,9 @@ import com.practice.queenstrello.domain.board.repository.BoardRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.user.entity.User;
+import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
+import com.practice.queenstrello.domain.workspace.repository.WorkspaceMemberRepository;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,12 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.practice.queenstrello.domain.board.entity.QBoard.board;
+
 @Service
 @RequiredArgsConstructor
 
 public class BoardService {
     private final BoardRepository boardRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
 
     @Transactional
     public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, User user) {
@@ -31,10 +36,12 @@ public class BoardService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new IllegalArgumentException("워크스페이스를 찾을 수 없습니다."));// 에러 코드 개선
 
-        if (user.isReadOnly()) {
+        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(user.getId(), workspaceId, MemberRole.READ);
+        //메서드로 묶고 public 처리 ,Global Exception 처리
+
+        if (isReadOnly) {
             throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_CREATE);
         }
-        //메서드로 묶고 public 처리 ,Global Exception 처리
 
         //생성자 생성
         Board newBoard = new Board(
@@ -69,7 +76,11 @@ public class BoardService {
         validateWorkspaceMember(user); //로그인 체크
         Board newBoard = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
-        if (user.isReadOnly()) {
+
+        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(
+                user.getId(), newBoard.getWorkspace().getId(), MemberRole.READ);
+
+        if (isReadOnly) {
             throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_UPDATE);
         }
         if (boardRequest.getBackgroundColor() != null) {
@@ -89,8 +100,8 @@ public class BoardService {
         validateWorkspaceMember(user); //로그인 체크
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
-    //Workspace 레파지토리 체크
-        if (user.isReadOnly()) {
+
+        if (user == null) {
             throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_DELETE);
         }
 
