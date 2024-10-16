@@ -29,6 +29,9 @@ public class User extends CreatedTimestamped {
     @Column(name="user_nickname", nullable = false, length = 50)
     private String nickname;
 
+    @Column(name="user_slack_url", length = 100)
+    private String slackUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private UserRole userRole;
