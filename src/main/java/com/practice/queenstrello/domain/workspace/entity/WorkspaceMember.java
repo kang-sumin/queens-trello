@@ -37,4 +37,5 @@ public class WorkspaceMember {
         this.member = member;
         this.workspace = workspace;
     }
+
 }

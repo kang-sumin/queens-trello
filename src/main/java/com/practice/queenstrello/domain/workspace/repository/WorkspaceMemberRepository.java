@@ -12,4 +12,8 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
 //    Optional<WorkspaceMember> findByMemberIdAndWorkspaceIdAndMemberRole(Long userId, Long workspaceId, MemberRole memberRole);
 
     boolean existsByMemberIdAndWorkspaceIdAndMemberRole(Long userId, Long workspaceId, MemberRole memberRole);
+
+    //멤버가 해당 워크스페이스에 속해있는 멤버가 맞는지 검증하는 쿼리메소드
+    boolean existsByMemberIdAndWorkspaceId(Long creatorId, Long workspaceId);
+
 }

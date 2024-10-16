@@ -19,6 +19,8 @@ import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
+import com.practice.queenstrello.domain.workspace.entity.MemberRole;
+import com.practice.queenstrello.domain.workspace.repository.WorkspaceMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,16 +43,23 @@ public class CardService {
     private final UserRepository userRepository;
     private final BoardListRepository boardListRepository;
     private final CommentRepository commentRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
 
     //카드 생성
     @Transactional
-    public CardSaveResponse saveCard(CardSaveRequest cardSaveRequest, long listId, Long creatorId) {
-        //카드생성자 확인
-        User creator = userRepository.findById(creatorId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+    public CardSaveResponse saveCard(CardSaveRequest cardSaveRequest, long listId, Long creatorId, Long workspaceId) {
+//        //카드생성자 확인
+//        User creator = userRepository.findById(creatorId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
-        //읽기전용이면 예외처리-user에서 찾는게 아니라 워크스페이스 내에서 파티원들을 구분지어야한다. ㅜ어크스페이스 멤버 리포지토리
-        if (creator.getUserRole().equals(UserRole.ROLE_USER)) {
-            throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
+        //워크스페이스에 속해 있는 멤버인지 확인
+        boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(creatorId, workspaceId);
+        if (!isMember) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+        }
+        // 워크스페이스 내에서 유저의 권한을 확인 ->READ만 아니면 된다. READ 상위애들 ROLE들은 다 할 수 있으니까.
+        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(creatorId, workspaceId, MemberRole.READ);
+        if (isReadOnly) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
         }
 
         //리스트 확인
@@ -63,7 +72,6 @@ public class CardService {
                 cardSaveRequest.getDeadLine(),
                 boardList); //리스트랑 연결
         boardList.addCard(card); //리스트에 카드 추가
-
         cardRepository.save(card);
 
         //담당자 추가 (생성자 써서 CardManager 생성/저장)
@@ -72,9 +80,9 @@ public class CardService {
             CardManager cardManager = new CardManager(card, manager);
             card.addCardManager(cardManager);
             cardManagerRepository.save(cardManager);
-        } //saveall메소드 고려 매니저id검증도 생각해야함 id를 IN으로
+        } //saveall메소드 고려
 
-        // ID로 담당자 리스트 반환 + 첨부내용 카드에는 첨부파일이 들어간다. 로그기록 기능을 고려해보자
+        // ID로 담당자 리스트 반환 -> 첨부내용 카드에는 첨부파일이 들어간다. 로그기록 기능을 ^고려^해보자
         List<Long> managerIds = managers.stream()
                 .map(User::getId)
                 .toList();
@@ -87,7 +95,13 @@ public class CardService {
     }
 
     //카드 다건 조회
-    public Page<CardSimpleResponse> getCards(Long listId, int page, int size) {
+    public Page<CardSimpleResponse> getCards(Long listId, Long memberId, Long workspaceId, int page, int size) {
+        //워크스페이스에 속해 있는 멤버인지 확인
+        boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(memberId, workspaceId);
+        if (!isMember) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+        }
+
         Pageable pagealbe = PageRequest.of(page, size);
         Page<Card> cards = cardRepository.findByListIdWithManagers(listId, pagealbe); //한번 빼고 되나
 
@@ -102,12 +116,18 @@ public class CardService {
         ));
     }
 
-    //카드 단건(상세) 조회 워크스페이스 멤버인지 확인해야함
-    public CardDetailResponse getCard(long cardId) {
+    //카드 단건(상세) 조회
+    public CardDetailResponse getCard(long cardId, Long memberId, Long workspaceId) {
+        // 워크스페이스에 속해 있는 멤버인지 확인
+        boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(memberId, workspaceId);
+        if (!isMember) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+        }
+
         //카드정보 조회
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException((ErrorCode.INVALID_CARD)));
 
-        //카드 정보와 담당자 목록 리스폰스하기 + 댓글도 +첨부파일
+        //카드 정보와 담당자 목록 리스폰스하기 + 댓글도 -> +첨부파일
         return new CardDetailResponse(
                 card.getTitle(),
                 card.getContent(),
@@ -123,13 +143,20 @@ public class CardService {
 
     //카드 수정
     @Transactional
-    public CardUpdateResponse updateCard(Long cardId, CardUpdateRequest cardUpdateRequest, Long userId) {
-        //수정하려는 사용자 권한 먼저 확인
+    public CardUpdateResponse updateCard(Long cardId, CardUpdateRequest cardUpdateRequest, Long userId,Long workspaceId) {
+       //사용자 확인->로그에 써야함
         User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
-        //읽기전용인 사람은 예외처리
-        if (user.getUserRole().equals(UserRole.ROLE_USER)) {
-            throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
+        // 워크스페이스에 속해 있는 멤버인지 확인
+        boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(userId, workspaceId);
+        if (!isMember) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+        }
+
+        // 워크스페이스 내에서 유저의 권한을 확인 -> READ가 아닌지 확인
+        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(userId, workspaceId, MemberRole.READ);
+        if (isReadOnly) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
         }
 
         //카드 찾기
@@ -145,7 +172,7 @@ public class CardService {
             cardLogService.saveLog(user,card,logMessage);
         } catch (Exception e) {
             //로그 저장 중 예외 발생해도, 로그만 별도 트랜잭션으로 구현했으니 수정과 별개로 처리해야한다.
-            System.out.println("로그 저장 중 에러가 발생했습니다." + e.getMessage()); //log.error로 수정
+            log.error("로그 저장 중 에러가 발생했습니다." + e.getMessage());
         }
 
 
@@ -190,14 +217,21 @@ public class CardService {
 
     //카드 삭제
     @Transactional
-    public void deleteCard(Long cardId, Long userId) {
+    public void deleteCard(Long cardId, Long userId,Long workspaceId) {
         //유저가 존재하는지 먼저 확인
-        User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+       // User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
         //삭제하려는 카드 조회
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
-        //읽기전용 사용자는 카드 삭제 불가
-        if (user.getUserRole().equals(UserRole.ROLE_USER)) {
-            throw new QueensTrelloException(ErrorCode.INVALID_USERROLE);
+        // 워크스페이스에 속해 있는 멤버인지 확인
+        boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(userId, workspaceId);
+        if (!isMember) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+        }
+
+        // 워크스페이스 내에서 유저의 권한을 확인 -> READ만 아니면 된다.
+        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(userId, workspaceId, MemberRole.READ);
+        if (isReadOnly) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
         }
         //카드에 연결된 데이터(카드 매니저, 댓글..) 삭제 ->cascade ,카드 날리기 전에 s3에 직접 첨부파일 삭제요청을 날리는 메서드
         cardManagerRepository.deleteByCardId(cardId); //담당자 삭제
