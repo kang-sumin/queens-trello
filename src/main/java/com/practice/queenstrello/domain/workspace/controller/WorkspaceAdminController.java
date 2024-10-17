@@ -23,7 +23,7 @@ public class WorkspaceAdminController {
     public ResponseEntity<String> updateUserRole(
             @PathVariable("userId") Long userId,
             @AuthenticationPrincipal AuthUser authUser
-    ){
+    ) {
         return ResponseEntity.ok(workspaceAdminService.updateUserRole(userId, authUser));
     }
 
@@ -33,7 +33,7 @@ public class WorkspaceAdminController {
             @PathVariable("workspaceId") Long workspaceId,
             @PathVariable("userId") Long userId,
             @RequestBody WorkspaceMemberRequest workspaceMemberRequest
-    ){
+    ) {
         return ResponseEntity.ok(workspaceAdminService.updateMemberRole(workspaceId, userId, workspaceMemberRequest));
     }
 
@@ -44,7 +44,7 @@ public class WorkspaceAdminController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal AuthUser authUser
-            ){
+    ) {
         return ResponseEntity.ok(workspaceAdminService.getMasterRequests(page, size, authUser));
     }
 
