@@ -41,6 +41,12 @@ public class AspectPractice {
     @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackAddMember)")
     private void slackMemberAnnotation() {}
 
+    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackCard)")
+    private void slackCardAnnotation() {}
+
+    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackComment)")
+    private void slackCommentAnnotation() {}
+
     //마스터 승급시 알림
     @AfterReturning("slackMasterAnnotation()")
     public void slackMaster(JoinPoint joinPoint) {
@@ -84,5 +90,17 @@ public class AspectPractice {
             e.printStackTrace();
         }
     }
+
+    @AfterReturning("slackCardAnnotation()")
+    public void slackCard(JoinPoint joinPoint) {
+
+    }
+
+    @AfterReturning("slackCommentAnnotation()")
+    public void slackComment(JoinPoint joinPoint) {
+
+    }
+
+
 
 }
