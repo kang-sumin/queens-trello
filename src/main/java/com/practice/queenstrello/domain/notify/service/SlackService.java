@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.notify.service;
 
+import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
 import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
@@ -45,6 +46,9 @@ public class SlackService {
     private final CommentRepository commentRepository;
 
     private final Slack slackClient = Slack.getInstance();
+
+    @SlackMaster
+    public void test() {}
 
 
     /**
@@ -113,13 +117,14 @@ public class SlackService {
         log.info("["+ classification +"] ::: To."+receiver.getId());
     }
 
-    public void inviteMember(Long inviterId, Long invitedId) {
+    public void inviteMember(Long inviterId, Long invitedId, Long workspaceId) {
         User inviter = findUser(inviterId);
         User invited = findUser(invitedId);
         String slackUrl = invited.getSlackUrl();
         Classification classification = Classification.Invite;
         String title = inviter.getNickname() + classification.getTitle();
-        Workspace workspace = workspaceRepository.findByMasterUser(inviter).orElseThrow(()-> new QueensTrelloException(ErrorCode.No_WORKSPACE_MASTER));
+        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(()->new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+        if(!workspace.getMasterUser().equals(inviter)) throw new QueensTrelloException(ErrorCode.No_WORKSPACE_MASTER);
         String moveUrl = combineAddress()+"/workspaces/"+workspace.getId();
         String content = "<"+moveUrl+"|"+workspace.getName()+"> \n" +workspace.getDescription();
         String message = inviter.getNickname()+"님의 작업공간 "+workspace.getName() +" 입니다! \n 우리 함께 끝까지 달려봐요!";
