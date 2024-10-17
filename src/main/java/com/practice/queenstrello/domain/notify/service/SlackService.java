@@ -1,14 +1,14 @@
 package com.practice.queenstrello.domain.notify.service;
 
-import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
-import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.entity.Comment;
 import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
 import com.practice.queenstrello.domain.notify.entity.Classification;
+import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
@@ -17,7 +17,7 @@ import com.slack.api.Slack;
 import com.slack.api.model.Attachment;
 import com.slack.api.model.Field;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ import java.util.List;
 
 import static com.slack.api.webhook.WebhookPayloads.payload;
 
-@Slf4j
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class SlackService {
