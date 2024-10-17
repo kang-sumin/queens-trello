@@ -3,6 +3,7 @@ package com.practice.queenstrello.domain.workspace.service;
 import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
@@ -33,6 +34,7 @@ public class WorkspaceAdminService {
 
     // Master로 권한 변경
     @Transactional
+    @SlackMaster
     public String updateUserRole(Long userId, AuthUser authUser) {
 
         // todo : 변경하려는 User권한이 ROLE_USER인지 확인하여 예외 처리 하기
