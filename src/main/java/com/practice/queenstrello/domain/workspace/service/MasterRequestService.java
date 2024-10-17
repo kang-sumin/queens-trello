@@ -23,6 +23,7 @@ public class MasterRequestService {
     @Transactional
     public String saveMasterRequest(AuthUser authUser) {
 
+        // 현재 로그인 되어있는 사용자 정보 객체
         User requestUser = User.fromAuthUser(authUser);
 
         // 요청한 사용자의 권한이 USER인지 확인
