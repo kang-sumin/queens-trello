@@ -21,4 +21,6 @@ public interface BoardListRepository extends JpaRepository<BoardList,Long> {
 
     // 순서가 특정 범위에 있는 BoardList 조회
     List<BoardList> findByBoardIdAndOrderBetween(Long boardId, Integer startOrder, Integer endOrder);
+
+    Integer countByBoardId(Long boardId);
 }

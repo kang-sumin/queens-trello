@@ -3,6 +3,7 @@ package com.practice.queenstrello.domain.workspace.service;
 import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
@@ -33,7 +34,8 @@ public class WorkspaceAdminService {
 
     // Master로 권한 변경
     @Transactional
-    public String updateUserRole(Long userId, AuthUser authUser) {
+    @SlackMaster
+    public String updateUserRole(Long userId) {
 
         // todo : 변경하려는 User권한이 ROLE_USER인지 확인하여 예외 처리 하기
 
@@ -50,7 +52,7 @@ public class WorkspaceAdminService {
     }
 
     // 승인되지 않은 Master 권한 변경 요청 내역 조회 (다건 조회)
-    public Page<MasterRequestResponse> getMasterRequests(int page, int size, AuthUser authUser) {
+    public Page<MasterRequestResponse> getMasterRequests(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
         Page<MasterRequest> masterRequests = masterRequestRepository.findAllByIsAcceptedFalse(pageable)

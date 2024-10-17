@@ -10,7 +10,7 @@ public interface CardManagerRepository extends JpaRepository<CardManager,Long> {
     List<CardManager> findByCardId(Long cardId);
 
     //특정 카드에 연결된 모든 CardManager삭제
-    Void deleteByCardId(Long cardId);
+    void deleteByCardId(Long cardId);
 
     // 특정 카드 안의 특정 담당자 삭제
     void deleteByCardIdAndManagerId(Long cardId, Long managerId);

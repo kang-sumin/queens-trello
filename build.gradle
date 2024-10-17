@@ -58,6 +58,12 @@ dependencies {
 
     //thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // JUnit 및 Mockito 의존성
+    testImplementation 'org.mockito:mockito-core:3.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
+
 }
 
 tasks.named('test') {

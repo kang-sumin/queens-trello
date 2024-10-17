@@ -21,10 +21,18 @@ public class WorkspaceAdminController {
     // Master로 권한 변경
     @PatchMapping("/users/{userId}")
     public ResponseEntity<String> updateUserRole(
-            @PathVariable("userId") Long userId,
-            @AuthenticationPrincipal AuthUser authUser
+            @PathVariable("userId") Long userId
     ) {
-        return ResponseEntity.ok(workspaceAdminService.updateUserRole(userId, authUser));
+        return ResponseEntity.ok(workspaceAdminService.updateUserRole(userId));
+    }
+
+    // 승인되지 않은 Master 권한 변경 요청 내역 조회 (다건 조회)
+    @GetMapping("/master-request")
+    public ResponseEntity<Page<MasterRequestResponse>> getMasterRequests(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.ok(workspaceAdminService.getMasterRequests(page, size));
     }
 
     // Member 권한 변경
@@ -38,14 +46,6 @@ public class WorkspaceAdminController {
     }
 
 
-    // 승인되지 않은 Master 권한 변경 요청 내역 조회 (다건 조회)
-    @GetMapping("/master-request")
-    public ResponseEntity<Page<MasterRequestResponse>> getMasterRequests(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal AuthUser authUser
-    ) {
-        return ResponseEntity.ok(workspaceAdminService.getMasterRequests(page, size, authUser));
-    }
+
 
 }
