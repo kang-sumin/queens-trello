@@ -38,13 +38,13 @@ public class User extends CreatedTimestamped {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private UserRole userRole;
-//    private String imageUrl;
+    private String imageUrl;
 
     @Column(name="is_deleted",nullable=false)
     private Boolean isDeleted = Boolean.FALSE;
 
-//    @Column(name="user_slack_url", nullable = false, length = 100)
-//    private String slackUrl;
+    @Column(name="user_slack_url", nullable = false, length = 100)
+    private String slackUrl;
 
 
     public User(@NotBlank @Email String email, String encodedPassword, @NotBlank String nickname, UserRole userRole) {
@@ -76,7 +76,7 @@ public class User extends CreatedTimestamped {
         this.userRole = userRole;
     }
 
-//    public void changeImage(String imageUrl) {
-//        this.imageUrl = imageUrl;
-//    }
+    public void changeImage(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }
