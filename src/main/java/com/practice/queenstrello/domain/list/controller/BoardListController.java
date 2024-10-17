@@ -24,7 +24,7 @@ public class BoardListController {
         return ResponseEntity.ok(boardListSaveResponse);
     }
 
-    @PutMapping("/boards/{boardId}/lists/{listId}")
+    @PutMapping("/boards/{boardId}/lists/{boardListId}")
     public ResponseEntity<BoardListSaveResponse> updateBoardList(
             @PathVariable Long boardListId,
             @AuthenticationPrincipal AuthUser authUser,
@@ -35,7 +35,7 @@ public class BoardListController {
         return ResponseEntity.ok(boardListResponse);
     }
 
-    @DeleteMapping("/boards/{boardId}/lists/{listId}")
+    @DeleteMapping("/boards/{boardId}/lists/{boardListId}")
     public void deleteBoardList(
             @PathVariable Long boardListId,
             @AuthenticationPrincipal AuthUser authUser,
