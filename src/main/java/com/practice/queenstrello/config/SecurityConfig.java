@@ -41,8 +41,8 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signin", "/auth/signup", "/health", "/html/create_workspace","/error", "/attachments/**").permitAll()
+                .authorizeHttpRequests(auth -> auth=
+                        .requestMatchers("/auth/signin", "/auth/signup", "/health","/error","/workspace", "/workspaces/**", "/attachments/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority(UserRole.Authority.ADMIN) // ADMIN 권한이 필요한 경로
                         .anyRequest().authenticated()
                 )
