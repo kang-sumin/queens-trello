@@ -90,6 +90,10 @@ public class WorkspaceService {
         User inviteMember = userRepository.findByEmail(workspaceMemberEmailRequest.getEmail())
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
+        // 이미 해당 멤버가 초대되어 있는지 예외 처리
+        if(!(workspaceMemberRepository.existsByMemberIdAndWorkspaceId(inviteMember.getId(), workspace.getId()))) {
+            throw new QueensTrelloException(ErrorCode.MEMBER_ALREADY_EXIST);
+        }
 
         // 사용자를 워크스페이스 멤버로 추가
         WorkspaceMember newWorkspaceMember = new WorkspaceMember(
