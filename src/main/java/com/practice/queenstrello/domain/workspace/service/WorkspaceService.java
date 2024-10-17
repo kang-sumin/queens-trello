@@ -3,6 +3,8 @@ package com.practice.queenstrello.domain.workspace.service;
 import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.notify.annotation.SlackAddMember;
+import com.practice.queenstrello.domain.notify.annotation.SlackInvite;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
@@ -22,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -72,6 +73,8 @@ public class WorkspaceService {
 
     // 워크 스페이스에 멤버 초대
     @Transactional
+    @SlackInvite
+    @SlackAddMember
     public String addMember(Long workspaceId, AuthUser authUser, WorkspaceMemberEmailRequest workspaceMemberEmailRequest) {
 
         // 로그인한 사용자
@@ -90,6 +93,10 @@ public class WorkspaceService {
         User inviteMember = userRepository.findByEmail(workspaceMemberEmailRequest.getEmail())
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
+        // 이미 해당 멤버가 초대되어 있는지 예외 처리
+        if(!(workspaceMemberRepository.existsByMemberIdAndWorkspaceId(inviteMember.getId(), workspace.getId()))) {
+            throw new QueensTrelloException(ErrorCode.MEMBER_ALREADY_EXIST);
+        }
 
         // 사용자를 워크스페이스 멤버로 추가
         WorkspaceMember newWorkspaceMember = new WorkspaceMember(

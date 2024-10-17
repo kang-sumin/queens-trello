@@ -19,7 +19,9 @@ public enum ErrorCode {
 
 
     // MemberRole Errorcode
-
+    MEMBER_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 멤버로 초대되어 있는 유저입니다."),
+    INVALID_MEMBER_ROLE(HttpStatus.UNPROCESSABLE_ENTITY,"유효하지 않은 MemberRole 입니다."),
+    SAME_EXIST_MEMBER_ROLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 멤버 권한과 변경하고자 하는 멤버 권한이 같습니다."),
 
     // Workspace Errorcode
     No_WORKSPACE_MASTER(HttpStatus.NOT_FOUND, "해당하는 유저는 워크스페이스를 가지고 있지 않습니다"),
@@ -27,11 +29,10 @@ public enum ErrorCode {
     MASTER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Master 요청 내역이 없습니다."),
     MASTER_REQUEST_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 Master 권한 요청 내역이 존재합니다."),
     HAS_NOT_ACCESS_PERMISSION(HttpStatus.CONFLICT, "해당 서비스에 접근 권한이 없습니다."),
-    INVALID_MEMBER_ROLE(HttpStatus.UNPROCESSABLE_ENTITY,"유효하지 않은 MemberRole 입니다."),
     WORKSPACE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 워크스페이스를 찾지 못하였습니다."),
     WORKSPACE_MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 워크스페이스에서 멤버를 찾지 못했습니다."),
-    SAME_EXIST_MEMBER_ROLE(HttpStatus.UNPROCESSABLE_ENTITY, "현재 멤버 권한과 변경하고자 하는 멤버 권한이 같습니다."),
     MASTER_REQUEST_NOT_EXIST(HttpStatus.BAD_REQUEST, "신청된 요청 내역이 없습니다."),
+
 
 
     // Board Errorcode
