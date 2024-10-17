@@ -16,8 +16,14 @@ import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceMemberRepository;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +51,14 @@ public class WorkspaceService {
                 user
         );
         Workspace savedWorkspace = workspaceRepository.save(newWorkspace);
+
+        // 사용자를 워크스페이스 (WORKSPACE) 권한 멤버로 추가
+        WorkspaceMember newWorkspaceMember = new WorkspaceMember(
+                MemberRole.WORKSPACE,
+                user,
+                savedWorkspace
+        );
+        workspaceMemberRepository.save(newWorkspaceMember);
 
         return new WorkspaceResponse(
                 savedWorkspace.getId(),
@@ -112,6 +126,30 @@ public class WorkspaceService {
                 user
         );
     }
+
+    // 워크스페이스 조회 (유저가 멤버로 가입된 자신의 워크스페이스 목록을 확인할 수 있음)
+    public Page<WorkspaceResponse> getUserWorkspace(int page, int size, AuthUser authUser) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        User user = User.fromAuthUser(authUser);
+
+        // 현재 로그인된 사용자의 ID로 등록된 WorspaceID 검색
+        List<Long> workspaceIds = workspaceMemberRepository.findWorkspaceIdByMemberId(user.getId())
+                .filter(list -> !list.isEmpty())    // 리스트가 비어있는지 확인
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+
+        Page<Workspace> workspaces = workspaceRepository.findByWorkspaceId(workspaceIds, pageable);
+
+        return workspaces.map(workspace -> new WorkspaceResponse(
+                workspace.getId(),
+                workspace.getName(),
+                workspace.getDescription(),
+                workspace.getCreatedAt(),
+                workspace.getMasterUser(),
+                workspace.getCreateUser()
+        ));
+    }
+
 
     // 워크 스페이스 삭제
     @Transactional

@@ -53,10 +53,10 @@ public class SlackController {
      * @param memberId 추가된 멤버의 ID
      * @return 성공 여부
      */
-    @PostMapping("/member/{userId}/{memberId}")
-    public String addMember(@PathVariable Long userId, @PathVariable Long memberId) {
+    @PostMapping("/member/{userId}/{workspaceId}/{memberId}")
+    public String addMember(@PathVariable Long userId, @PathVariable Long workspaceId, @PathVariable Long memberId) {
         try {
-            slackService.addMember(userId, memberId);
+            slackService.addMember(userId,workspaceId, memberId);
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";

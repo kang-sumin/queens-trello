@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class WorkspacePageController {
-    @GetMapping("/workspace")
+    @GetMapping("/workspaces")
     public String createWorkspaces() {
         return "createWorkspace";
     }

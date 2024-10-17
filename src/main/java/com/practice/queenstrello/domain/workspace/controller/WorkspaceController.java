@@ -7,6 +7,7 @@ import com.practice.queenstrello.domain.workspace.dto.response.WorkspaceResponse
 import com.practice.queenstrello.domain.workspace.dto.response.WorkspaceUpdateResponse;
 import com.practice.queenstrello.domain.workspace.service.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,16 @@ public class WorkspaceController {
             @RequestBody WorkspaceRequest workspaceRequest
     ) {
         return ResponseEntity.ok(workspaceService.updateWorkspace(workspaceId, authUser, workspaceRequest));
+    }
+
+    // 워크스페이스 조회 (유저가 멤버로 가입된 자신의 워크스페이스 목록을 확인할 수 있음)
+    @GetMapping("/workspace")
+    public ResponseEntity<Page<WorkspaceResponse>> getUserWorkspace(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal AuthUser authUser
+    ){
+        return ResponseEntity.ok(workspaceService.getUserWorkspace(page, size, authUser));
     }
 
     // 워크 스페이스 삭제

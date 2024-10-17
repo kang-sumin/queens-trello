@@ -40,9 +40,6 @@ public class BoardService {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
 
-        Board board = boardRepository.findById(workspaceId)
-                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
-
         //워크스페이스의 아이디와 현재 접속해있는 사용자 아이디로 현재 사용자의 워크스페이스 멤버 권한을 확인할수있다
         //보드가 존재하면 해당 보드가 속해있는 워크스페이스의 아이디 값을 받아와서 그 아이디로 멤버가 멤버의 역할을 조회할수있음
         WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), workspaceId)
