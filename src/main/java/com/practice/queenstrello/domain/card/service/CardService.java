@@ -269,6 +269,11 @@ public class CardService {
                 cardManagerRepository.deleteByCardId(cardId); //담당자 삭제
                 commentRepository.deleteByCardId(cardId); //댓글 삭제
 
+                // S3에서 첨부파일 삭제 (만약 있다면)
+                // TODO: S3 첨부파일 삭제 로직 구현
+                // s3Service.deleteAttachments(cardId);
+
+
                 //카드 삭제
                 cardRepository.delete(card);
 
