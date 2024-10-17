@@ -29,15 +29,33 @@ public class BoardList {
     private Integer order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="borad_id", nullable=false)
+    @JoinColumn(name="board_id", nullable=false)
     private Board board;
 
     @OneToMany(mappedBy = "boardList")
     private List<Card> cards = new ArrayList<>();
 
-    //카드 추가 메서드
-    public void addCard(Card card){
-        this.cards.add(card);
-        card.setBoardList(this); //카드와 리스트 연결
+    public BoardList(String title, Integer order) {
+        this.title = title;
+        this.order = order;
     }
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+    //리스트 순서 수정 메서드
+    public void changeOrder(Integer order) {
+        this.order = order;
+    }
+    //리스트 카드 추가 메서드
+    public void addCard(Card card) {
+        cards.add(card);
+        card.setBoardList(this); //양방향 연관관계 설정
+    }
+    //리스트 카드 제거 메서드
+    public void removeCard(Card card) {
+        cards.remove(card);
+        card.setBoardList(null); //양방향 연관관계 해제
+    }
+
 }
