@@ -53,7 +53,7 @@ public class BoardListController {
             @AuthenticationPrincipal AuthUser authUser
             ) {
         boardListService.insertBoardList(boardId, boardList, targetOrder);
-        return ResponseEntity.ok("BoardList가 " + targetOrder + "번째 위치에 성공적으로 삽입되었습니다.");
+        return ResponseEntity.ok("BoardList inserted successfully at order " + targetOrder + ".");
     }
 
     //기존 보드리스트의 순서변경
