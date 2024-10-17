@@ -1,5 +1,7 @@
 package com.practice.queenstrello.domain.board.entity;
 
+import com.practice.queenstrello.domain.board.dto.request.BoardSaveRequest;
+import com.practice.queenstrello.domain.comment.entity.Comment;
 import com.practice.queenstrello.domain.common.entity.ModifiedTimestamped;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
@@ -18,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name="boards")
 public class Board extends ModifiedTimestamped {
-
+    //name 부분 삭제 필요 다른 분들이랑 맞출것
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="board_id")
@@ -37,8 +39,57 @@ public class Board extends ModifiedTimestamped {
     @JoinColumn(name="workspace_id", nullable=false)
     private Workspace workspace;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardList> boardLists = new ArrayList<>();
 
+
+    public Board(Long id, String title, String backgroundColor, String imageUrl, Workspace workspace) {
+        this.id = id;
+        this.title = title;
+        this.backgroundColor = backgroundColor;
+        this.imageUrl = imageUrl;
+        this.workspace = workspace;
+    }
+
+    public Board(String title, String backgroundColor, String imageUrl, Workspace workspace) {
+        this.title = title;
+        this.backgroundColor = backgroundColor;
+        this.imageUrl = imageUrl;
+        this.workspace = workspace;
+    }
+
+    public void changeTitle(String title) {
+        if (title != null && !title.isEmpty()) {
+            this.title = title;
+        }
+    }
+
+    public void changeBackgroundColor(String backgroundColor) {
+        if (backgroundColor != null && !backgroundColor.isEmpty()) {
+            this.backgroundColor = backgroundColor;
+        }
+    }
+
+    public void changeImageUrl(String imageUrl) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            this.imageUrl = imageUrl;
+        }
+    }
+
+    public void updateBoard(String title, String backgroundColor, String imageUrl) {
+        changeTitle(title);
+        changeBackgroundColor(backgroundColor);
+        changeImageUrl(imageUrl);
+    }
+
+    public void addBoardList(BoardList boardList) {
+        boardLists.add(boardList);
+        boardList.setBoard(this);
+    }
+
+    public void removeBoardList(BoardList boardList) {
+        boardLists.remove(boardList);
+        boardList.setBoard(null);
+    }
 
 }
