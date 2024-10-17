@@ -12,7 +12,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "잘못된 비밀번호입니다."),
     // User ErrorCode
     INVALID_USER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
-    PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 ㄸ않습니다."),
+    PASSWORD_MISMATCH(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
     USER_HAS_NOT_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // Attachment ErrorCode
@@ -43,13 +43,16 @@ public enum ErrorCode {
     TITLE_ESSENTIAL(HttpStatus.CREATED,"보드 제목은 필수입니다."),
 
     // List Errorcode
+    INVALID_LIST(HttpStatus.BAD_REQUEST,"유효하지 않은 listId 입니다."),
     BOARDLIST_NOT_FOUND(HttpStatus.NOT_FOUND,"리스트가 없습니다."),
     HAS_NOT_ACCESS_PERMISSION_WRITE(HttpStatus.CONFLICT,"읽기 전용 멤버는 이 작업을 수행할 수 없습니다."),
 
     // Card Errorcode
+    INVALID_USERROLE(HttpStatus.CONFLICT,"읽기 전용 사용자는 권한이 없습니다."),
     INVALID_CARD(HttpStatus.BAD_REQUEST,"유효하지 않은 cardId 입니다."),
     NOT_CARD_MANAGER(HttpStatus.BAD_REQUEST,"해당 카드의 매니저가 아닙니다."),
-
+    CONCURRENT_UPDATE_ERROR(HttpStatus.CONFLICT,"동시 업데이트로 인해 작업을 완료할 수 없습니다. 최신 데이터를 확인하고 다시 시도해주세요"),
+    CONCURRENT_DELETE_ERROR(HttpStatus.CONFLICT,"동시 삭제로 인해 작업을 완료할 수 없습니다. 최신 데이터를 확인하고 다시 시도해주세요"),
     // Comment Errorcode
     INVALID_COMMENT(HttpStatus.BAD_REQUEST,"유효하지 않은 commentId 입니다."),
     INVALID_COMMENTUSER(HttpStatus.METHOD_NOT_ALLOWED,"본인 댓글만 수정 및 삭제가 가능합니다."),

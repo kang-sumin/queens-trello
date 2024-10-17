@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember, Long> {
     boolean existsByMemberIdAndWorkspaceIdAndMemberRole(Long userId, Long workspaceId, MemberRole memberRole);
 
+    //멤버가 해당 워크스페이스에 속해있는 멤버가 맞는지 검증하는 쿼리메소드
     boolean existsByMemberIdAndWorkspaceId(Long userId, Long workspaceId);
 
     Optional<WorkspaceMember> findByMemberIdAndWorkspaceId(Long userId, Long workspaceId);
