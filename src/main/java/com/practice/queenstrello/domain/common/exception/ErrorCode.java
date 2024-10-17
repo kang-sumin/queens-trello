@@ -35,10 +35,15 @@ public enum ErrorCode {
 
 
     // Board Errorcode
-
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 보드를 찾을 수 없습니다."),
+    INVALID_AUTHORITY_UPDATE(HttpStatus.NOT_ACCEPTABLE, "보드를 수정 할 권한이 없습니다."),
+    INVALID_AUTHORITY_DELETE(HttpStatus.NOT_ACCEPTABLE,"보드를 삭제 할 권한이 없습니다."),
+    INVALID_AUTHORITY_CREATE(HttpStatus.NOT_ACCEPTABLE,"보드를 생성 할 권한이 없습니다."),
+    TITLE_ESSENTIAL(HttpStatus.CREATED,"보드 제목은 필수입니다."),
 
     // List Errorcode
-
+    BOARDLIST_NOT_FOUND(HttpStatus.NOT_FOUND,"리스트가 없습니다."),
+    HAS_NOT_ACCESS_PERMISSION_WRITE(HttpStatus.CONFLICT,"읽기 전용 멤버는 이 작업을 수행할 수 없습니다."),
 
     // Card Errorcode
     INVALID_CARD(HttpStatus.BAD_REQUEST,"유효하지 않은 cardId 입니다."),

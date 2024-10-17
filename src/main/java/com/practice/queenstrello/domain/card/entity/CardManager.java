@@ -26,4 +26,10 @@ public class CardManager {
     @JoinColumn(name="manager_id", nullable = false)
     private User manager;
 
+    //카드 담당자 생성자
+    public CardManager(Card card, User manager){
+        this.card=card;
+        this.manager=manager;
+    }
+
 }
