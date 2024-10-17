@@ -1,4 +1,4 @@
-package com.practice.queenstrello.config;
+package com.practice.queenstrello.domain.notify.entity;
 
 public enum Color {
     GREEN("#36a64f"),

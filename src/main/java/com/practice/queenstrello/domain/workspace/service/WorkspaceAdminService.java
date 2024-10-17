@@ -53,9 +53,16 @@ public class WorkspaceAdminService {
     public Page<MasterRequestResponse> getMasterRequests(int page, int size, AuthUser authUser) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-//        Page<MasterRequest> masterRequests = findMasterRequests()
+        Page<MasterRequest> masterRequests = masterRequestRepository.findAllByIsAcceptedFalse(pageable)
+                .filter(mr -> !mr.isEmpty())
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.MASTER_REQUEST_NOT_EXIST));
 
-        return null;
+        return masterRequests.map(mr -> new MasterRequestResponse(
+                mr.getId(),
+                mr.getIsAccepted(),
+                mr.getCreatedAt(),
+                mr.getRequestUser()
+        ));
     }
 
 
@@ -77,15 +84,15 @@ public class WorkspaceAdminService {
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
 
         // 변경하고자 하는 사용자가 변경하고자 하는 워크스페이스 멤버로 존재하는지 확인
-        if(!(workspaceMemberRepository.existsByMemberIdAndWorkspaceId(userId, workspaceId))){
+        if (!(workspaceMemberRepository.existsByMemberIdAndWorkspaceId(userId, workspaceId))) {
             throw new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND);
         }
 
         WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(userId, workspaceId)
-                .orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
 
         // 변경하고자하는 멤버권한이 기존 권한과 같을 경우 예외 처리
-        if(workspaceMember.getMemberRole().equals(MemberRole.of(workspaceMemberRequest.getMemberRole()))){
+        if (workspaceMember.getMemberRole().equals(MemberRole.of(workspaceMemberRequest.getMemberRole()))) {
             throw new QueensTrelloException(ErrorCode.SAME_EXIST_MEMBER_ROLE);
         }
 

@@ -1,6 +1,6 @@
 package com.practice.queenstrello.domain.notify.service;
 
-import com.practice.queenstrello.config.Color;
+import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.entity.Comment;
@@ -16,6 +16,7 @@ import com.slack.api.Slack;
 import com.slack.api.model.Attachment;
 import com.slack.api.model.Field;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static com.slack.api.webhook.WebhookPayloads.payload;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SlackService {
@@ -58,12 +60,13 @@ public class SlackService {
                         .username("queens-trello")
                         .attachments(List.of(
                                 Attachment.builder()
-                                        .color(Color.GREEN.getCode()) // 메시지 색상
+                                        .color(Color.BLUE.getCode()) // 메시지 색상
                                         .pretext(message)// 메시지 본문 내용
                                         .text(content)  //이동할 url
                                         .build())))
 
                 );
+
                 //자세한 내용이 있는 경우
             } else if(classification.equals(Classification.Card)||classification.equals(Classification.Comment)) {
                 slackClient.send(slackUrl, payload(p -> p
@@ -72,7 +75,7 @@ public class SlackService {
                         .username("queens-trello")
                         .attachments(List.of(
                                 Attachment.builder()
-                                        .color(Color.GREEN.getCode()) // 메시지 색상
+                                        .color(Color.RED.getCode()) // 메시지 색상
                                         .pretext(message)// 메시지 본문 내용
                                         .fields(List.of(
                                                 new Field(fieldTitle, fieldContent, false)
@@ -101,12 +104,13 @@ public class SlackService {
         Classification classification = Classification.Master;
         String title = classification.getTitle();
         String message = "당신은 마스터로 승급되었습니다. 당신만의 워크스페이스를 만들어보세요!";
-        String createUrl = combineAddress()+"/workspace";
+        String createUrl = combineAddress()+"/workspaces";
         String content = "<"+createUrl+"|"+"워크스페이스 생성하기"+">";
 
         User receiver = findUser(userId);
         String slackUrl = receiver.getSlackUrl();
         sendMessage(classification, slackUrl, title, message, content,null,null);
+        log.info("["+ classification +"] ::: To."+receiver.getId());
     }
 
     public void inviteMember(Long inviterId, Long invitedId) {
@@ -120,17 +124,20 @@ public class SlackService {
         String content = "<"+moveUrl+"|"+workspace.getName()+"> \n" +workspace.getDescription();
         String message = inviter.getNickname()+"님의 작업공간 "+workspace.getName() +" 입니다! \n 우리 함께 끝까지 달려봐요!";
         sendMessage(classification, slackUrl, title, message, content,null,null);
+        log.info("["+ classification +"] ::: Form."+inviter.getId()+" ::: To."+invited.getId()+" ::: workspaceLink : "+moveUrl);
     }
 
 
-    public void addMember(Long userId, Long memberId) {
+    public void addMember(Long userId,Long worksapceId, Long memberId) {
         User receiver = findUser(userId);
         String slackUrl = receiver.getSlackUrl();
         Classification classification = Classification.Member;
         String title = classification.getTitle();
         User member = findUser(memberId);
-        String message = "우리 워크스페이스에 "+ member.getNickname()+"님이 오셨어요! 어서 와서 환영해주세요!";
+        Workspace workspace = workspaceRepository.findById(worksapceId).orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+        String message = workspace.getName()+" 워크스페이스에 "+ member.getNickname()+"님이 오셨어요! 어서 와서 환영해주세요!";
         sendMessage(classification, slackUrl, title, message,null,null,null);
+        log.info("["+ classification +"] ::: To."+receiver.getId()+" ::: of.Workspace : "+workspace.getName());
     }
 
     public void changeCard(Long userId, Long cardId) {
@@ -143,6 +150,7 @@ public class SlackService {
         String title = classification.getTitle();
         String message = card.getTitle()+" 카드 내용을 꼼꼼히 확인하세요!";
         sendMessage(classification, slackUrl, title, message,null,card.getTitle(),card.getContent());
+        log.info("["+ classification +"] ::: To."+receiver.getId()+" ::: of.Card : "+card.getId());
     }
 
     public void addComment(Long userId, Long commentId) {
@@ -156,6 +164,7 @@ public class SlackService {
         String title = classification.getTitle();
         String message = card.getTitle() +"카드에 "+comment.getUser().getNickname()+"님이 작성한 댓글입니다.";
         sendMessage(classification, slackUrl, title, message,null,"From."+comment.getUser().getNickname(),comment.getContent());
+        log.info("["+ classification +"] ::: To."+receiver.getId()+" ::: of.Comment : "+comment.getId());
     }
 
     private String combineAddress() {
