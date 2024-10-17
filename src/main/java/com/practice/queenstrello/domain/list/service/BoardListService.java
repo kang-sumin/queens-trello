@@ -56,6 +56,7 @@ public class BoardListService{
                 boardListSaveRequest.getTitle(),
                 boardListSaveRequest.getOrder()
         );
+        boardList.setBoard(board);
         BoardList savedBoardList = boardListRepository.save(boardList);
         return BoardListSaveResponse.of(savedBoardList);
     }
