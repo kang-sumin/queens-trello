@@ -120,7 +120,7 @@ public class BoardListService{
         //순서가 큰 boardList 가져오기
         List<BoardList> listsToUpdate = boardListRepository.findByBoardIdAndOrderGreaterThan(boardId, boardList.getOrder());
 
-        //order값 하나씩 감소시키기
+        //order값 하나씩 감소시키기, 삽입이랑, 증가, 순서 바꾸는 것(어떻게 순서를 바꿀건지)
         for (BoardList list : listsToUpdate) {
             list.setOrder(list.getOrder() - 1);
         }

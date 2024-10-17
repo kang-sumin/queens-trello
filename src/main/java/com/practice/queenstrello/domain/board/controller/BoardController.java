@@ -1,5 +1,6 @@
 package com.practice.queenstrello.domain.board.controller;
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.board.dto.request.BoardSaveRequest;
 import com.practice.queenstrello.domain.board.dto.request.BoardUpdateRequest;
 import com.practice.queenstrello.domain.board.dto.response.BoardSaveResponse;
@@ -20,23 +21,24 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping
-    public ResponseEntity<BoardSaveResponse> savedBoard(@PathVariable("workspaceId") Long workspaceId, @RequestBody BoardSaveRequest boardSaveRequest, @RequestAttribute("user") User user) {
-        BoardSaveResponse boardSaveResponse = boardService.savedBoard(workspaceId, boardSaveRequest, user);
+    public ResponseEntity<BoardSaveResponse> savedBoard(@PathVariable("workspaceId") Long workspaceId, @RequestBody BoardSaveRequest boardSaveRequest, @RequestAttribute("user") AuthUser authUser) {
+        BoardSaveResponse boardSaveResponse = boardService.savedBoard(workspaceId, boardSaveRequest, authUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(boardSaveResponse);
 
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardSaveResponse> getBoard(@PathVariable long boardId) {
-        BoardSaveResponse boardSaveResponse = boardService.getBoard(boardId);
+    public ResponseEntity<BoardSaveResponse> getBoard(@PathVariable long boardId, @RequestAttribute("user") User user ) {
+        BoardSaveResponse boardSaveResponse = boardService.getBoard(boardId, user);
         return ResponseEntity.ok(boardSaveResponse);
     }
 
     @GetMapping
     public ResponseEntity<List<BoardSaveResponse>> getBoards(
-            @RequestParam Long workspaceId // 워크스페이스 ID를 요청 파라미터로 받음
+            @RequestParam Long workspaceId,// 워크스페이스 ID를 요청 파라미터로 받음
+            @RequestAttribute("user") User user
     ) {
-        List<BoardSaveResponse> boardResponseList = boardService.getBoards(workspaceId);
+        List<BoardSaveResponse> boardResponseList = boardService.getBoards(workspaceId, user);
         return ResponseEntity.ok(boardResponseList);
     }
 
