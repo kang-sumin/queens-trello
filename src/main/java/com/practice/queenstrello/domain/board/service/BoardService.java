@@ -28,19 +28,19 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
-    private final AuthUser authUser;
 
     @Transactional
-    public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, User user) {
+    public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, AuthUser authUser) {
         //현재 로그인 한 사용자 정보 가져오고 그 사용자의 권한(ADMIN, MASTER, USER)확인 User객체로서 받아온다.
-        User requestUser = User.fromAuthUser(authUser);
+        User user = User.fromAuthUser(authUser);
 
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
 
         boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(user.getId(), workspaceId, MemberRole.READ);
-        //메서드로 묶고 public 처리 ,Global Exception 처리
+        //메서드로 묶고 public 처리
 
+        //Global Exception 처리
         if (isReadOnly) {
             throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_CREATE);
         }

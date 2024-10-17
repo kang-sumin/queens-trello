@@ -5,7 +5,6 @@ import com.practice.queenstrello.domain.list.dto.request.BoardListSaveRequest;
 import com.practice.queenstrello.domain.list.dto.request.BoardListUpdateRequest;
 import com.practice.queenstrello.domain.list.dto.response.BoardListSaveResponse;
 import com.practice.queenstrello.domain.list.service.BoardListService;
-import com.practice.queenstrello.domain.workspace.entity.WorkspaceMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,17 +25,21 @@ public class BoardListController {
     @PutMapping("/{listId}")
     public ResponseEntity<BoardListSaveResponse> updateBoardList(
             @PathVariable long boardListId,
-            @RequestBody BoardListUpdateRequest boardListUpdateRequest
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody BoardListUpdateRequest boardListUpdateRequest,
+            @PathVariable long boardId
     ) {
-        BoardListSaveResponse boardListResponse = boardListService.updateBoardList(boardListId, boardListUpdateRequest, new WorkspaceMember());
+        BoardListSaveResponse boardListResponse = boardListService.updateBoardList(boardListId, boardListUpdateRequest, authUser, boardId);
         return ResponseEntity.ok(boardListResponse);
     }
 
     @DeleteMapping("/{listId}")
     public void deleteBoardList(
-            @PathVariable long boardListId
+            @PathVariable long boardListId,
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable long boardId
     ) {
-        boardListService.deleteBoardList(boardListId, new WorkspaceMember());
+        boardListService.deleteBoardList(boardListId, authUser, boardId);
     }
 
 
