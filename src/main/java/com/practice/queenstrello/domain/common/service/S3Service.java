@@ -21,11 +21,6 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    /**
-     * 메서드에 대한 설명
-     * @param multipartFile //파라미터에 대한 설명
-     * @return 리턴에 대한 설명
-     */
     public String uploadFile(MultipartFile multipartFile) {
         try {
             String fileName = multipartFile.getOriginalFilename();
@@ -34,15 +29,22 @@ public class S3Service {
             metadata.setContentLength(multipartFile.getSize());
             metadata.setContentType(multipartFile.getContentType());
 
-            // ACL 설정 없이 파일을 업로드
             amazonS3Client.putObject(
                     new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
-                            .withCannedAcl(CannedAccessControlList.PublicRead)
+                    // ACL 설정 제거
             );
-            // 업로드한 파일의 URL 반환
+
             return amazonS3Client.getUrl(bucket, fileName).toString();
         } catch (IOException e) {
             throw new QueensTrelloException(ErrorCode.FILE_UPLOAD_ERROR);
+        }
+    }
+
+    public void deleteFile(String fileName) {
+        try {
+            amazonS3Client.deleteObject(bucket, fileName);
+        } catch (Exception e) {
+            throw new QueensTrelloException(ErrorCode.FILE_DELETE_ERROR);
         }
     }
 }

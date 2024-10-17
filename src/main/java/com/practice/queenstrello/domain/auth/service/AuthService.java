@@ -52,7 +52,7 @@ public class AuthService {
         User user = userRepository.findByEmail(authSigninRequest.getEmail()).orElseThrow(
                 () -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
-        // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환
+        // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우
         if (!passwordEncoder.matches(authSigninRequest.getPassword(), user.getPassword())) {
             throw new QueensTrelloException(ErrorCode.INVALID_PASSWORD);
         }
