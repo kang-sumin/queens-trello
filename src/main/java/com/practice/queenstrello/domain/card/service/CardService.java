@@ -83,7 +83,7 @@ public class CardService {
             cardManagerRepository.save(cardManager);
         } //saveall메소드 고려
 
-        // ID로 담당자 리스트 반환 -> 첨부내용 카드에는 첨부파일이 들어간다. 로그기록 기능을 ^고려^해보자
+        // ID로 담당자 리스트 반환 -> 첨부내용 카드에는 첨부파일이 들어간다. 로그기록 기능을 ^고려^해보자 시러요 ㅜ
         List<Long> managerIds = managers.stream()
                 .map(User::getId)
                 .toList();
@@ -229,7 +229,7 @@ public class CardService {
 
             } catch (OptimisticLockException e) {
                 // 예외처리 및 재시도 로직
-                if (retryCount == maxRetries - 1) {
+                if (retryCount == maxRetries - 1) { //재시도 카운트가 마지막 재시도일 때 예외던지려고.
                     throw new QueensTrelloException(ErrorCode.CONCURRENT_UPDATE_ERROR);
                 }
                 retryCount++;
@@ -247,25 +247,50 @@ public class CardService {
     //카드 삭제
     @Transactional
     public void deleteCard(Long cardId, Long userId, Long workspaceId) {
-        //삭제하려는 카드 조회
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
-        // 워크스페이스에 속해 있는 멤버인지 확인
-        boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(userId, workspaceId);
-        if (!isMember) {
-            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+        int maxRetries = 3;
+        int retryCount = 0;
+
+        while(retryCount<maxRetries){
+            try {
+                //삭제하려는 카드 조회
+                Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
+                // 워크스페이스에 속해 있는 멤버인지 확인
+                boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(userId, workspaceId);
+                if (!isMember) {
+                    throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+                }
+
+                // 워크스페이스 내에서 유저의 권한을 확인 -> READ만 아니면 된다.
+                boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(userId, workspaceId, MemberRole.READ);
+                if (isReadOnly) {
+                    throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
+                }
+                //카드에 연결된 데이터(카드 매니저, 댓글..) 삭제 ->cascade ,카드 날리기 전에 s3에 직접 첨부파일 삭제요청을 날리는 메서드
+                cardManagerRepository.deleteByCardId(cardId); //담당자 삭제
+                commentRepository.deleteByCardId(cardId); //댓글 삭제
+
+                //카드 삭제
+                cardRepository.delete(card);
+
+                return;
+            } catch (OptimisticLockException e){
+                if(retryCount == maxRetries - 1) {
+                    //최대 재시도 횟수 초과하면 예외
+                    throw new QueensTrelloException(ErrorCode.CONCURRENT_DELETE_ERROR);
+                }
+                retryCount++;
+                try {
+                    //재시도 전 잠시 대기
+                    Thread.sleep(100);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new QueensTrelloException(ErrorCode.CONCURRENT_DELETE_ERROR);
+                }
+            }
         }
 
-        // 워크스페이스 내에서 유저의 권한을 확인 -> READ만 아니면 된다.
-        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(userId, workspaceId, MemberRole.READ);
-        if (isReadOnly) {
-            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
-        }
-        //카드에 연결된 데이터(카드 매니저, 댓글..) 삭제 ->cascade ,카드 날리기 전에 s3에 직접 첨부파일 삭제요청을 날리는 메서드
-        cardManagerRepository.deleteByCardId(cardId); //담당자 삭제
-        commentRepository.deleteByCardId(cardId); //댓글 삭제
-
-        //카드 삭제
-        cardRepository.delete(card);
+        //모든 재시도 실패 시
+        throw new QueensTrelloException(ErrorCode.CONCURRENT_DELETE_ERROR);
     }
 
 }
