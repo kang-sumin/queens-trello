@@ -18,13 +18,15 @@ public class BoardListController {
 
     private final BoardListService boardListService;
 
+    // 리스트 생성
     @PostMapping("/boards/{boardId}/lists")
     public ResponseEntity<BoardListSaveResponse> savedBoardList (@RequestBody BoardListSaveRequest boardListSaveRequest, @AuthenticationPrincipal AuthUser authUser, @PathVariable("boardId") Long boardId) {
         BoardListSaveResponse boardListSaveResponse =  boardListService.savedBoardList(boardListSaveRequest, authUser, boardId);
         return ResponseEntity.ok(boardListSaveResponse);
     }
 
-    @PutMapping("/boards/{boardId}/lists/{listId}")
+    // 리스트 수정
+    @PutMapping("/boards/{boardId}/lists/{boardListId}")
     public ResponseEntity<BoardListSaveResponse> updateBoardList(
             @PathVariable Long boardListId,
             @AuthenticationPrincipal AuthUser authUser,
@@ -35,7 +37,8 @@ public class BoardListController {
         return ResponseEntity.ok(boardListResponse);
     }
 
-    @DeleteMapping("/boards/{boardId}/lists/{listId}")
+    // 리스트 삭제
+    @DeleteMapping("/boards/{boardId}/lists/{boardListId}")
     public void deleteBoardList(
             @PathVariable Long boardListId,
             @AuthenticationPrincipal AuthUser authUser,
@@ -43,19 +46,20 @@ public class BoardListController {
     ) {
         boardListService.deleteBoardList(boardListId, authUser, boardId);
     }
-    //특정 위치에 새로운 보드리스트 삽입
-    @PostMapping("/boards/{boardId}/lists/insert")
-    public ResponseEntity<String> insertBoardListOrder(
-            @PathVariable Long boardId,
-            @RequestParam Integer targetOrder,
-            @RequestBody BoardList boardList,
-            @AuthenticationPrincipal AuthUser authUser
-            ) {
-        boardListService.insertBoardList(boardId, boardList, targetOrder);
-        return ResponseEntity.ok("BoardList inserted successfully at order " + targetOrder + ".");
-    }
 
-    //기존 보드리스트의 순서변경
+//    //특정 위치에 새로운 리스트 삽입
+//    @PostMapping("/boards/{boardId}/lists/insert")
+//    public ResponseEntity<String> insertBoardListOrder(
+//            @PathVariable Long boardId,
+//            @RequestParam Integer targetOrder,
+//            @RequestBody BoardList boardList,
+//            @AuthenticationPrincipal AuthUser authUser
+//            ) {
+//        boardListService.insertBoardList(boardId, boardList, targetOrder);
+//        return ResponseEntity.ok("BoardList inserted successfully at order " + targetOrder + ".");
+//    }
+
+    //기존 리스트의 순서변경
     @PutMapping("/boards/{boardId}/lists/insert/{listId}/order")
     public ResponseEntity<String> changeBoardListOrder(
             @PathVariable Long boardId,
@@ -63,7 +67,7 @@ public class BoardListController {
             @RequestParam Integer newOrder,
             @AuthenticationPrincipal AuthUser authUser) {
 
-        boardListService.changeBoardListOrder(boardId, listId, newOrder);
+        boardListService.changeBoardListOrder(boardId, listId, newOrder, authUser);
         return ResponseEntity.ok("BoardList order changed successfully to " + newOrder + ".");
     }
 
