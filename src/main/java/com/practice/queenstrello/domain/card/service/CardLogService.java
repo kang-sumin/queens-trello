@@ -16,7 +16,7 @@ public class CardLogService {
     private final CardLogRepository cardLogRepository;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW) //독립적인 트랜잭션
-    public void saveLog(User user, Card card, String logMessage) {
+    public void saveLog(Long user, Long card, String logMessage) {
         CardLog log = new CardLog(user,card,logMessage);
         cardLogRepository.save(log);
     }

@@ -75,6 +75,9 @@ public class CardService {
         boardList.addCard(card); //리스트에 카드 추가
         cardRepository.save(card);
 
+        // 카드가 생성될때 로그 생성
+        cardLogService.saveLog(creatorId, card.getId(), "카드 생성됨");
+
         //담당자 추가 (생성자 써서 CardManager 생성/저장)
         List<User> managers = userRepository.findAllById(cardSaveRequest.getManagerIds());
         for (User manager : managers) {
@@ -176,7 +179,7 @@ public class CardService {
                         user.getId(), cardId, updateTime, cardUpdateRequest.getTitle(), cardUpdateRequest.getContent(), cardUpdateRequest.getDeadLine());
                 //로그 저장(로그 저장이 실패해도 수정 작업에 영향을 주지 않도록 트라이캐치)
                 try {
-                    cardLogService.saveLog(user, card, logMessage);
+                    cardLogService.saveLog(user.getId(), card.getId(), logMessage);
                 } catch (Exception e) {
                     //로그 저장 중 예외 발생해도, 로그만 별도 트랜잭션으로 구현했으니 수정과 별개로 처리해야한다.
                     log.error("로그 저장 중 에러가 발생했습니다." + e.getMessage());
@@ -242,6 +245,7 @@ public class CardService {
             }
         }
         throw new QueensTrelloException(ErrorCode.CONCURRENT_UPDATE_ERROR);
+
     }
 
     //카드 삭제
@@ -276,6 +280,8 @@ public class CardService {
 
                 //카드 삭제
                 cardRepository.delete(card);
+                // 카드가 삭제될때 로그 생성
+                cardLogService.saveLog(userId, card.getId(), "카드 삭제됨");
 
                 return;
             } catch (OptimisticLockException e){

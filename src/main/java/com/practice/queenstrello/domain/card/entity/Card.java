@@ -44,9 +44,6 @@ public class Card extends CreatedTimestamped {
     @JoinColumn(name="list_id", nullable = false)
     private BoardList boardList;
 
-   @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE)
-   private List<CardLog> cardLogs = new ArrayList<>();
-
     @Version
     private Long version; //낙관적 락을 위한 버전 필드
 

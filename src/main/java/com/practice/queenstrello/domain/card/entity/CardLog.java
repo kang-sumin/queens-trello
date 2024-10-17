@@ -19,19 +19,18 @@ public class CardLog extends CreatedTimestamped{
     private String log; //수정 내용에 대한 설명
 
 
-    @ManyToOne(fetch = FetchType.LAZY) //수정된 사용자 정보
-    @JoinColumn(name="user_id")
-    private User user;
+    //수정된 사용자 정보
+    @Column(name="user_id")
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY) //수정된 카드 정보
-    @JoinColumn(name="card_id")
-    private Card card;
+    //수정된 카드 정보
+    @Column(name="card_id")
+    private Long cardId;
 
     // 생성자 : 로그 생성에 필요한 필드들
-    public CardLog(User user, Card card, String log){
-        this.user=user;
-        this.card=card;
+    public CardLog(Long user, Long card, String log){
+        this.userId=user;
+        this.cardId=card;
         this.log=log;
-        //this.createdAt=LocalDateTime.now(); //생성시간 자동 설정
     }
 }
