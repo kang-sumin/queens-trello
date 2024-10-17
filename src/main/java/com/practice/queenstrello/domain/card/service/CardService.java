@@ -17,10 +17,10 @@ import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.user.entity.User;
-import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceMemberRepository;
+import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -51,8 +51,6 @@ public class CardService {
     //카드 생성
     @Transactional
     public CardSaveResponse saveCard(CardSaveRequest cardSaveRequest, long listId, Long creatorId, Long workspaceId) {
-//        //카드생성자 확인
-//        User creator = userRepository.findById(creatorId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
         //워크스페이스에 속해 있는 멤버인지 확인
         boolean isMember = workspaceMemberRepository.existsByMemberIdAndWorkspaceId(creatorId, workspaceId);
@@ -144,10 +142,11 @@ public class CardService {
         ); //of 나 builder 쓰면 간결해짐
     }
 
-    //카드 수정
+    //카드 수정 + 동시성 제어
     @Transactional
-    public CardUpdateResponse updateCard(Long cardId, CardUpdateRequest cardUpdateRequest, Long userId,Long workspaceId) {
-       //사용자 확인->로그에 써야함
+    public CardUpdateResponse updateCard(Long cardId, CardUpdateRequest cardUpdateRequest, Long userId, Long workspaceId) {
+
+        //사용자 확인->로그에 써야함
         User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
 
         // 워크스페이스에 속해 있는 멤버인지 확인
@@ -162,90 +161,92 @@ public class CardService {
             throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION);
         }
 
-        //카드 찾기
-        Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
+        //충돌 났을 때 재시도 로직..최대 3번까지만 리트라이 가능
+        int maxRetries = 3;
+        int retryCount = 0;
+        while (retryCount < maxRetries) {
+            try {
+                // **카드 업데이트 로직 부분
+                //카드 찾기
+                Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
+                //현재 시간 기록(언제 수정했는지 기록하기 위해서)
+                LocalDateTime updateTime = LocalDateTime.now();
+                //로그 메시지 생성
+                String logMessage = String.format("User %s updated card %s : title='%s', content='%s', deadline='%s'",
+                        user.getId(), cardId, updateTime, cardUpdateRequest.getTitle(), cardUpdateRequest.getContent(), cardUpdateRequest.getDeadLine());
+                //로그 저장(로그 저장이 실패해도 수정 작업에 영향을 주지 않도록 트라이캐치)
+                try {
+                    cardLogService.saveLog(user, card, logMessage);
+                } catch (Exception e) {
+                    //로그 저장 중 예외 발생해도, 로그만 별도 트랜잭션으로 구현했으니 수정과 별개로 처리해야한다.
+                    log.error("로그 저장 중 에러가 발생했습니다." + e.getMessage());
+                }
+                //카드 수정(제목,설명,데드라인) -> 메서드만들어서 사용함
+                card.updateCard(cardUpdateRequest.getTitle(), cardUpdateRequest.getContent(), cardUpdateRequest.getDeadLine());
 
-        //현재 시간 기록(언제 수정했는지 기록하기 위해서)
-        LocalDateTime updateTime = LocalDateTime.now();
-        //로그 메시지 생성
-        String logMessage = String.format("User %s updated card %s : title='%s', content='%s', deadline='%s'",
-                user.getId(), cardId, updateTime,cardUpdateRequest.getTitle(), cardUpdateRequest.getContent(), cardUpdateRequest.getDeadLine());
-        //로그 저장(로그 저장이 실패해도 수정 작업에 영향을 주지 않도록 트라이캐치)
-        try {
-            cardLogService.saveLog(user,card,logMessage);
-        } catch (Exception e) {
-            //로그 저장 중 예외 발생해도, 로그만 별도 트랜잭션으로 구현했으니 수정과 별개로 처리해야한다.
-            log.error("로그 저장 중 에러가 발생했습니다." + e.getMessage());
-        }
+                //*** 담당자 수정 과정
+                // 1. 기존 담당자 리스트 조회
+                List<CardManager> existingManagers = cardManagerRepository.findByCardId(cardId);
+                // 2. 요청에서 들어온 담당자 ID 리스트
+                List<Long> newManagerIds = cardUpdateRequest.getManagerIds();
+                // 3. 기존 담당자 중에서 제거할 담당자들 삭제
+                Set<Long> existingManagerIds = existingManagers.stream()
+                        .map(manager -> manager.getManager().getId())
+                        .collect(Collectors.toSet());
+
+                Set<Long> newManagerIdSet = new HashSet<>(newManagerIds);
+                // 기존 담당자 중에서 새로운 리스트에 없는 담당자를 삭제
+                for (CardManager existingManager : existingManagers) {
+                    if (!newManagerIdSet.contains(existingManager.getManager().getId())) {
+                        cardManagerRepository.deleteByCardIdAndManagerId(cardId, existingManager.getManager().getId());
+                    }
+                }
+                // 4. 새로 추가할 담당자 추가
+                List<User> newManagers = userRepository.findAllById(newManagerIds);
+                // 새로운 담당자 중 기존에 없는 담당자만 추가
+                List<CardManager> managersToAdd = newManagers.stream()
+                        .filter(manager -> !existingManagerIds.contains(manager.getId()))
+                        .map(manager -> new CardManager(card, manager))
+                        .collect(Collectors.toList());
+
+                if (!managersToAdd.isEmpty()) {
+                    cardManagerRepository.saveAll(managersToAdd);
+                }
+
+                //5. 수정된 담당자 리스트 반환
+                List<Long> updatedManagerIds = newManagers.stream()
+                        .map(User::getId)
+                        .collect(Collectors.toList());
+
+                cardRepository.save(card); //변경사항 저장
 
 
-        //카드 수정(제목,설명,데드라인)->메서드만들어서 사용함
-        card.updateCard(cardUpdateRequest.getTitle(), cardUpdateRequest.getContent(), cardUpdateRequest.getDeadLine());
+                return new CardUpdateResponse(card.getId(),
+                        card.getTitle(),
+                        card.getContent(),
+                        card.getDeadLine(),
+                        updatedManagerIds);
 
-        //*** 담당자 수정 과정
-        // 1. 기존 담당자 리스트 조회
-        List<CardManager> existingManagers = cardManagerRepository.findByCardId(cardId);
-        // 2. 요청에서 들어온 담당자 ID 리스트
-        List<Long> newManagerIds = cardUpdateRequest.getManagerIds();
-        // 3. 기존 담당자 중에서 제거할 담당자들 삭제 ->IN절
-//        for (CardManager existingManager : existingManagers) {
-//            if (!newManagerIds.contains(existingManager.getManager().getId())) {
-//                cardManagerRepository.deleteByCardIdAndManagerId(cardId, existingManager.getManager().getId());
-//            }
-//        }
-        Set<Long> existingManagerIds = existingManagers.stream()
-                .map(manager -> manager.getManager().getId())
-                .collect(Collectors.toSet());
-
-        Set<Long> newManagerIdSet = new HashSet<>(newManagerIds);
-
-        // 기존 담당자 중에서 새로운 리스트에 없는 담당자를 삭제
-        for (CardManager existingManager : existingManagers) {
-            if (!newManagerIdSet.contains(existingManager.getManager().getId())) {
-                cardManagerRepository.deleteByCardIdAndManagerId(cardId, existingManager.getManager().getId());
+            } catch (OptimisticLockException e) {
+                // 예외처리 및 재시도 로직
+                if (retryCount == maxRetries - 1) {
+                    throw new QueensTrelloException(ErrorCode.CONCURRENT_UPDATE_ERROR);
+                }
+                retryCount++;
+                try {
+                    Thread.sleep(100); //잠깐 대기해라요이우잉잉
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new QueensTrelloException(ErrorCode.CONCURRENT_UPDATE_ERROR);
+                }
             }
         }
-        // 4. 새로 추가할 담당자 추가
-        List<User> newManagers = userRepository.findAllById(newManagerIds);
-
-        // 새로운 담당자 중 기존에 없는 담당자만 추가
-        List<CardManager> managersToAdd = newManagers.stream()
-                .filter(manager -> !existingManagerIds.contains(manager.getId()))
-                .map(manager -> new CardManager(card, manager))
-                .collect(Collectors.toList());
-
-        if (!managersToAdd.isEmpty()) {
-            cardManagerRepository.saveAll(managersToAdd);
-        }
-
-//        for (User manager : newManagers) {
-//            //이미 등록된 담당자가 아닐 때에 비로소 추가하게끔 조건 걸기. 먼저 리스트를 "비교"하고, 있는건 두고 없어진 목록들만 따로 날리고 새로운것들 넣고
-//            if (existingManagers.stream().noneMatch(cardManager -> cardManager.getManager().getId().equals(manager.getId()))) {
-//                CardManager newCardManager = new CardManager(card, manager);
-//                card.addCardManager(newCardManager);
-//                cardManagerRepository.save(newCardManager);
-//            }
-//        }
-
-        //5. 수정된 담당자 리스트 반환
-        List<Long> updatedManagerIds = newManagers.stream()
-                .map(User::getId)
-                .collect(Collectors.toList());
-
-
-        return new CardUpdateResponse(card.getId(),
-                card.getTitle(),
-                card.getContent(),
-                card.getDeadLine(),
-                updatedManagerIds);
-
+        throw new QueensTrelloException(ErrorCode.CONCURRENT_UPDATE_ERROR);
     }
 
     //카드 삭제
     @Transactional
-    public void deleteCard(Long cardId, Long userId,Long workspaceId) {
-        //유저가 존재하는지 먼저 확인
-       // User user = userRepository.findById(userId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+    public void deleteCard(Long cardId, Long userId, Long workspaceId) {
         //삭제하려는 카드 조회
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
         // 워크스페이스에 속해 있는 멤버인지 확인

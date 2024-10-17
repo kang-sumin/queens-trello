@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DialectOverride;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class Card extends CreatedTimestamped {
     private String content;
 
     @Column(name="card_deadline", nullable=false)
-    private LocalDateTime deadLine; //
+    private LocalDateTime deadLine;
 
     @OneToMany(mappedBy = "card")
     private List<Comment> comments = new ArrayList<>();
@@ -42,6 +43,9 @@ public class Card extends CreatedTimestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="list_id", nullable = false)
     private BoardList boardList;
+
+    @Version
+    private Long version; //낙관적 락을 위한 버전 필드
 
     //카드 생성자
     public Card(String title, String content, LocalDateTime deadLine,BoardList boardList){
