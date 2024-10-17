@@ -7,6 +7,7 @@ import com.practice.queenstrello.domain.notify.service.SlackService;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.dto.request.WorkspaceMemberEmailRequest;
+import com.practice.queenstrello.domain.workspace.entity.Workspace;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,11 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Aspect
@@ -32,6 +37,9 @@ public class AspectPractice {
 
     @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackInvite)")
     private void slackInviteAnnotation() {}
+
+    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackAddMember)")
+    private void slackMemberAnnotation() {}
 
     //마스터 승급시 알림
     @AfterReturning("slackMasterAnnotation()")
@@ -57,4 +65,24 @@ public class AspectPractice {
             e.printStackTrace();
         }
     }
+
+    @Async
+    @AfterReturning("slackMemberAnnotation()")
+    public void slackMember(JoinPoint joinPoint) {
+        try{
+            Long workspaceId = (Long) joinPoint.getArgs()[0];
+            WorkspaceMemberEmailRequest request = (WorkspaceMemberEmailRequest) joinPoint.getArgs()[2];
+            User invited = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_USER));
+            Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(()->new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+            List<User> memberList = workspace.getMembers().stream().map(wm->wm.getMember()).toList();
+            for(User member : memberList) {
+                if(!Objects.equals(member.getId(), invited.getId())) {
+                    slackService.addMember(member.getId(), workspaceId, invited.getId());
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
