@@ -34,15 +34,18 @@ public class Card extends CreatedTimestamped {
     @Column(name="card_deadline", nullable=false)
     private LocalDateTime deadLine;
 
-    @OneToMany(mappedBy = "card")
+    @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "card")
+    @OneToMany(mappedBy = "card",cascade = CascadeType.REMOVE)
     private List<CardManager> cardManagers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="list_id", nullable = false)
     private BoardList boardList;
+
+   @OneToMany(mappedBy = "card", cascade = CascadeType.REMOVE)
+   private List<CardLog> cardLogs = new ArrayList<>();
 
     @Version
     private Long version; //낙관적 락을 위한 버전 필드

@@ -27,27 +27,28 @@ public class CardController {
     @PostMapping
     public ResponseEntity<CardSaveResponse> saveCard(@RequestBody CardSaveRequest cardSaveRequest, @PathVariable long listId,  @PathVariable long workspaceId, @AuthenticationPrincipal AuthUser authUser){
         Long creatorId = authUser.getUserId(); //AuthUser에서 userId 가져옴
+        System.out.println("황ㄱ인");
         CardSaveResponse cardSaveResponse = cardService.saveCard(cardSaveRequest,listId,creatorId,workspaceId);
         return ResponseEntity.ok(cardSaveResponse);
     }
 
     //카드 다건 조회
     @GetMapping
-    public ResponseEntity<Page<CardSimpleResponse>> getCards(@PathVariable Long listId, @RequestParam Long memberId,@RequestParam Long workspaceId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<CardSimpleResponse>> getCards(@PathVariable Long listId, @RequestParam Long memberId, @PathVariable Long workspaceId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<CardSimpleResponse> cardSimpleResponses = cardService.getCards(listId,memberId, workspaceId,page,size);
         return ResponseEntity.ok(cardSimpleResponses);
     }
 
     //카드 단건 조회
     @GetMapping("/{cardId}")
-    public ResponseEntity<CardDetailResponse> getCard(@PathVariable long cardId,  @RequestParam Long memberId, @RequestParam Long workspaceId) {
+    public ResponseEntity<CardDetailResponse> getCard(@PathVariable long cardId,  @RequestParam Long memberId, @PathVariable Long workspaceId) {
         CardDetailResponse cardDetailResponse = cardService.getCard(cardId,memberId, workspaceId);
         return ResponseEntity.ok(cardDetailResponse);
     }
 
     //카드 수정
     @PutMapping("/{cardId}")
-    public ResponseEntity<CardUpdateResponse> updateCard(@PathVariable Long cardId,@RequestBody CardUpdateRequest cardUpdateRequest, @RequestParam Long workspaceId, @AuthenticationPrincipal AuthUser authUser){
+    public ResponseEntity<CardUpdateResponse> updateCard(@PathVariable Long cardId,@RequestBody CardUpdateRequest cardUpdateRequest, @PathVariable Long workspaceId, @AuthenticationPrincipal AuthUser authUser){
         Long userId = authUser.getUserId(); //AuthUser에서 userId 가져옴
         CardUpdateResponse updatedCard = cardService.updateCard(cardId,cardUpdateRequest,userId, workspaceId);
         return ResponseEntity.ok(updatedCard);
@@ -60,6 +61,8 @@ public class CardController {
         cardService.deleteCard(cardId,userId,workspaceId);
         return ResponseEntity.noContent().build();
     }
+
+
 
 
 
