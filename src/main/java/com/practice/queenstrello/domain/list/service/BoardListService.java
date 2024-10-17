@@ -112,6 +112,7 @@ public class BoardListService{
         if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
             throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
         }
+        //삭제할 보드 리스트 조회
         BoardList boardList = boardListRepository.findById(boardListId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
         //보드 리스트 삭제
@@ -128,6 +129,56 @@ public class BoardListService{
         //변경된 BoardList 저장
         boardListRepository.saveAll(listsToUpdate);
     }
+    @Transactional
+    public void insertBoardList(Long boardId, BoardList newBoardList, Integer targetOrder) {
+        // 순서가 targetOrder 이상인 boardList 가져오기
+        List<BoardList> listsToUpdate = boardListRepository.findByBoardIdAndOrderGreaterThanEqual(boardId, targetOrder);
+
+        // order값 하나씩 증가시키기
+        for (BoardList list : listsToUpdate) {
+            list.setOrder(list.getOrder() + 1);
+        }
+        // 변경된 리스트들을 저장합니다.
+        boardListRepository.saveAll(listsToUpdate);
+
+        // 새로운 BoardList의 order 설정 및 저장
+        newBoardList.setOrder(targetOrder);
+        // Board 객체 설정 필요 시 추가
+        // newBoardList.setBoard(board);
+        boardListRepository.save(newBoardList);
+    }
+
+    @Transactional
+    public void changeBoardListOrder(Long boardId, Long boardListId, Integer newOrder) {
+        //순서를 변경할 BoardList를 조회
+    BoardList boardList = boardListRepository.findById(boardListId)
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
+    Integer oldOrder = boardList.getOrder();
+
+    if (newOrder == oldOrder) {
+        return;
+    }
+
+    if (newOrder > oldOrder) {
+        // 순서가 큰 경우: oldOrder+1부터 newOrder까지의 리스트들의 order를 1씩 감소
+        List<BoardList> listsToUpdate = boardListRepository.findByBoardIdAndOrderBetween(boardId, oldOrder + 1, newOrder);
+        for (BoardList list : listsToUpdate) {
+            list.setOrder(list.getOrder() - 1);
+        }
+        boardListRepository.saveAll(listsToUpdate);
+    } else {
+        // 순서가 작은 경우: newOrder부터 oldOrder-1까지의 리스트들의 order를 1씩 증가
+        List<BoardList> listsToUpdate = boardListRepository.findByBoardIdAndOrderBetween(boardId, newOrder, oldOrder - 1);
+        for (BoardList list : listsToUpdate) {
+            list.setOrder(list.getOrder() + 1);
+        }
+        boardListRepository.saveAll(listsToUpdate);
+    }
+
+    // 변경된 BoardList의 order를 설정하고 저장합니다.
+    boardList.setOrder(newOrder);
+    boardListRepository.save(boardList);
+}
 }
 
 

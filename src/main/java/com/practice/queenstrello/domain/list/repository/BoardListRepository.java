@@ -15,4 +15,10 @@ public interface BoardListRepository extends JpaRepository<BoardList,Long> {
     @Transactional
     @Query("DELETE FROM Card c WHERE c.boardList.id = :listId")
     void deleteAllCardsByBoardListId(Long listId);
+
+    // 순서가 특정 값보다 크거나 같은 BoardList 조회
+    List<BoardList> findByBoardIdAndOrderGreaterThanEqual(Long boardId, Integer order);
+
+    // 순서가 특정 범위에 있는 BoardList 조회
+    List<BoardList> findByBoardIdAndOrderBetween(Long boardId, Integer startOrder, Integer endOrder);
 }
