@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lists/{listId}/cards")
+@RequestMapping("workspaces/{workspaceId}/boards/{boardId}/lists/{listId}/cards")
 public class CardController {
     private final CardService cardService;
 
