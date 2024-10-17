@@ -15,6 +15,6 @@ public class AuthSignupRequest {
     private String nickname;
     @NotBlank
     private String userRole;
-//    @NotBlank
-//    private String slackUrl;
+    @NotBlank
+    private String slackUrl;
 }
