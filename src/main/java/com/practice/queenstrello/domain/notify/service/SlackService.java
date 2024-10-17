@@ -101,7 +101,7 @@ public class SlackService {
         Classification classification = Classification.Master;
         String title = classification.getTitle();
         String message = "당신은 마스터로 승급되었습니다. 당신만의 워크스페이스를 만들어보세요!";
-        String createUrl = combineAddress()+"/workspace";
+        String createUrl = combineAddress()+"/workspaces";
         String content = "<"+createUrl+"|"+"워크스페이스 생성하기"+">";
 
         User receiver = findUser(userId);
