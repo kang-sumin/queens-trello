@@ -39,7 +39,6 @@ public class User extends CreatedTimestamped {
     @Column(nullable=false)
     private UserRole userRole;
 
-
     @Column(name="is_deleted",nullable=false)
     private Boolean isDeleted = Boolean.FALSE;
 
@@ -76,6 +75,4 @@ public class User extends CreatedTimestamped {
     public void updateRole(UserRole userRole) {
         this.userRole = userRole;
     }
-
-
 }

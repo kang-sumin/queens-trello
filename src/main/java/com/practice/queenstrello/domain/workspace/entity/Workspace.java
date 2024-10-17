@@ -59,4 +59,5 @@ public class Workspace extends ModifiedTimestamped {
         this.name = workspaceRequest.getName();
         this.description = workspaceRequest.getDescription();
     }
+
 }
