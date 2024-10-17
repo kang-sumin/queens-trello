@@ -22,6 +22,7 @@ public enum ErrorCode {
 
 
     // Workspace Errorcode
+    No_WORKSPACE_MASTER(HttpStatus.NOT_FOUND, "해당하는 유저는 워크스페이스를 가지고 있지 않습니다"),
     HAS_NOT_ACCESS_PERMISSION_MASTER_REQUEST(HttpStatus.FORBIDDEN, "Master 변경 요청 권한이 없습니다."),
     MASTER_REQUEST_NOT_FOUND(HttpStatus.NOT_FOUND, "Master 요청 내역이 없습니다."),
     MASTER_REQUEST_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 Master 권한 요청 내역이 존재합니다."),
@@ -39,10 +40,12 @@ public enum ErrorCode {
 
 
     // Card Errorcode
-
+    INVALID_CARD(HttpStatus.BAD_REQUEST,"유효하지 않은 cardId 입니다."),
+    NOT_CARD_MANAGER(HttpStatus.BAD_REQUEST,"해당 카드의 매니저가 아닙니다."),
 
     // Comment Errorcode
-
+    INVALID_COMMENT(HttpStatus.BAD_REQUEST,"유효하지 않은 commentId 입니다."),
+    INVALID_COMMENTUSER(HttpStatus.METHOD_NOT_ALLOWED,"본인 댓글만 수정 및 삭제가 가능합니다."),
 
     // Search Errorcode
     NOT_FOUND_NICKNAME(HttpStatus.NOT_FOUND, "해당 닉네임의 유저가 존재하지 않습니다."),
