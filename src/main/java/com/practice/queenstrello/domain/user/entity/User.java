@@ -47,11 +47,12 @@ public class User extends CreatedTimestamped {
     private String slackUrl;
 
 
-    public User(@NotBlank @Email String email, String encodedPassword, @NotBlank String nickname, UserRole userRole) {
+    public User(@NotBlank @Email String email, String encodedPassword, @NotBlank String nickname, UserRole userRole, String slackUrl) {
         this.email = email;
         this.password = encodedPassword;
         this.nickname = nickname;
         this.userRole = userRole;
+        this.slackUrl = slackUrl;
     }
 
     // Service 로직에서 UserRepository를 주입받지 User객체를 생성하지 않고 인증된 AuthUser로 User 객체를 받아오기 위해서 사용

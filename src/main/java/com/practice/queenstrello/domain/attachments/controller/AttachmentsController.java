@@ -19,11 +19,10 @@ public class AttachmentsController {
 
     // 첨부파일 업로드
     @PutMapping("/image")
-    public ResponseEntity<Void> uploadAttachment(
-            @RequestPart("cardId") Long cardId,
+    public ResponseEntity<String> uploadAttachment(
             @RequestPart("file") MultipartFile file) { // 파일 첨부
 
-        attachmentsService.uploadAttachmentLinkToCard(file, cardId); // 카드에 파일 링크 추가
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        String fileUrl = attachmentsService.uploadAttachmentLinkToCard(file); //
+        return ResponseEntity.status(HttpStatus.CREATED).body(fileUrl);
     }
 }

@@ -19,13 +19,11 @@ public class AttachmentsService {
 
     private final S3Service s3Service;
 
-    public void uploadAttachmentLinkToCard(MultipartFile file, Long cardId) {
-        Card card = cardRepository.findById(cardId)
-                .orElseThrow(() -> new QueensTrelloException(ErrorCode.CARD_NOT_FOUND));
+    public String uploadAttachmentLinkToCard(MultipartFile file) {
 
         // S3에 파일 업로드 후 URL 반환
-        String fileUrl = s3Service.uploadFile(file);
-        card.setFileUrl(fileUrl);
+        return s3Service.uploadFile(file);
+
 
     }
 }

@@ -37,7 +37,8 @@ public class AuthService {
                 authSignupRequest.getEmail(),
                 encodedPassword,
                 authSignupRequest.getNickname(),
-                userRole
+                userRole,
+                authSignupRequest.getSlackUrl()
         );
         User savedUser = userRepository.save(newUser);
 
