@@ -36,10 +36,10 @@ public class SlackController {
      * @param invitedId 초대받은 유저 ID
      * @return 성공 여부
      */
-    @PostMapping("/invite/{inviterId}/{invitedId}")
-    public String invite(@PathVariable Long inviterId, @PathVariable Long invitedId) {
+    @PostMapping("/invite/{inviterId}/{invitedId}/{workspaceId}")
+    public String invite(@PathVariable Long inviterId, @PathVariable Long invitedId, @PathVariable Long workspaceId) {
         try {
-            slackService.inviteMember(inviterId, invitedId);
+            slackService.inviteMember(inviterId, invitedId,workspaceId);
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";
