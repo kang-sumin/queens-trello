@@ -42,12 +42,6 @@ public class Board extends ModifiedTimestamped {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<BoardList> boardLists = new ArrayList<>();
 
-    public Board(BoardSaveRequest boardSaveRequest, Workspace workspace) {
-        this.title = boardSaveRequest.getTitle();
-        this.backgroundColor = boardSaveRequest.getBackgroundColor();
-        this.imageUrl = boardSaveRequest.getImageUrl();
-        this.workspace = workspace;
-    }
 
     public Board(Long id, String title, String backgroundColor, String imageUrl, Workspace workspace) {
         this.id = id;

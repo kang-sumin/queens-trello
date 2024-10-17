@@ -32,7 +32,7 @@ public class BoardService {
 
     @Transactional
     public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, User user) {
-
+        //현재 로그인 한 사용자 정보 가져오고 그 사용자의 권한(ADMIN, MASTER, USER)확인 User객체로서 받아온다.
         User requestUser = User.fromAuthUser(authUser);
 
         Workspace workspace = workspaceRepository.findById(workspaceId)

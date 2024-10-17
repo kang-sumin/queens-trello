@@ -61,9 +61,35 @@ public class BoardListService{
     }
 
     @Transactional
-    public BoardListSaveResponse updateBoardList(long boardListId, BoardListUpdateRequest boardListUpdateRequest, WorkspaceMember member) {
-        validateWritePermission(member);
-        BoardList boardList = boardListRepository.findById(boardListId)
+    public BoardListSaveResponse updateBoardList(BoardListUpdateRequest boardListUpdateRequest,  AuthUser authUser, Long boardId) {
+        //validateWritePermission(member);
+        //현재 로그인 한 사용자 정보 가져오고 그 사용자의 권한(ADMIN, MASTER, USER)확인 User객체로서 받아온다.
+        User user = User.fromAuthUser(authUser);
+
+        //리스트를 추가할 보드가 존재하는지 확인
+        //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
+
+        //워크스페이스의 아이디와 현재 접속해있는 사용자 아이디로 현재 사용자의 워크스페이스 멤버 권한을 확인할수있다
+        //보드가 존재하면 해당 보드가 속해있는 워크스페이스의 아이디 값을 받아와서 그 아이디로 멤버가 멤버의 역할을 조회할수있음
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), board.getWorkspace().getId())
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
+
+        //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
+        if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+        }
+
+        BoardList boardList = new BoardList(
+                boardListUpdateRequest.getTitle(),
+                boardListUpdateRequest.getOrder()
+        );
+        BoardList savedBoardList = boardListRepository.save(boardList);
+        return BoardListSaveResponse.of(savedBoardList);
+    }
+
+    BoardList boardList = boardListRepository.findById(boardListId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
         if (boardListUpdateRequest.getTitle() != null) {
             boardList.changeTitle(boardListUpdateRequest.getTitle());
@@ -71,13 +97,30 @@ public class BoardListService{
         if (boardListUpdateRequest.getOrder() != null) {
             boardList.changeOrder(boardListUpdateRequest.getOrder());
         }
+
         BoardList updateBoardList = boardListRepository.save(boardList);
         return BoardListSaveResponse.of(updateBoardList);
-    }
 
     @Transactional
-    public void deleteBoardList(long boardListId, WorkspaceMember member) {
-        validateWritePermission(member);
+    public void deleteBoardList(long boardListId, AuthUser authUser, Long boardId) {
+        //validateWritePermission(member);
+        //현재 로그인 한 사용자 정보 가져오고 그 사용자의 권한(ADMIN, MASTER, USER)확인 User객체로서 받아온다.
+        User user = User.fromAuthUser(authUser);
+
+        //리스트를 추가할 보드가 존재하는지 확인
+        //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
+
+        //워크스페이스의 아이디와 현재 접속해있는 사용자 아이디로 현재 사용자의 워크스페이스 멤버 권한을 확인할수있다
+        //보드가 존재하면 해당 보드가 속해있는 워크스페이스의 아이디 값을 받아와서 그 아이디로 멤버가 멤버의 역할을 조회할수있음
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), board.getWorkspace().getId())
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
+
+        //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
+        if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+        }
 
         BoardList boardList = boardListRepository.findById(boardListId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARDLIST_NOT_FOUND));
@@ -98,13 +141,14 @@ public class BoardListService{
         //변경된 BoardList 저장
         boardListRepository.saveAll(listsToUpdate);
     }
+}
+
+
 
     //쓰기 권한 검증 -> 다 필요!
-    private void validateWritePermission(WorkspaceMember member) {
-        if (member.getMemberRole() == MemberRole.READ) {
-            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+    //private void validateWritePermission(WorkspaceMember member) {
+    //    if (member.getMemberRole() == MemberRole.READ) {
+    //      throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+    //    }
 
-        }
-    }
-}
 

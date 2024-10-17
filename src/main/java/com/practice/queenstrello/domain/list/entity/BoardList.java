@@ -34,12 +34,6 @@ public class BoardList {
 
     @OneToMany(mappedBy = "boardList")
     private List<Card> cards = new ArrayList<>();
-    //생성자
-    public BoardList(String title, Integer order, Board board) {
-        this.title = title;
-        this.order = order;
-        this.board = board;
-    }
 
     public BoardList(String title, Integer order) {
         this.title = title;
