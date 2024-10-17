@@ -1,7 +1,6 @@
 package com.practice.queenstrello.domain.card.repository;
 
 import com.practice.queenstrello.domain.card.entity.Card;
-import com.practice.queenstrello.domain.user.entity.User;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,7 +25,7 @@ public class CardDslRepositoryImpl implements CardDslRepository {
 
     //card 통합검색 QueryDsl
     @Override
-    public Page<Card> searchCard(String title, String content, String deadline, User manager, Pageable pageable) {
+    public Page<Card> searchCard(String title, String content, String deadline, String nickname, Pageable pageable) {
         List<Card> result  = queryFactory
                             .select(card)
                             .distinct()
@@ -35,7 +34,7 @@ public class CardDslRepositoryImpl implements CardDslRepository {
                             .where(titleContains(title),
                                     contentContains(content),
                                     deadLineEq(deadline),
-                                    managerEq(manager)
+                                    managerEq(nickname)
                             ).offset(pageable.getOffset())
                             .limit(pageable.getPageSize())
                             .fetch();
@@ -60,7 +59,7 @@ public class CardDslRepositoryImpl implements CardDslRepository {
     }
 
     //card 담당자중에 해당 manager가 있는 경우
-    private BooleanExpression managerEq(User manager) {
-        return manager != null ? cardManager.manager.eq(manager) : null;
+    private BooleanExpression managerEq(String nickname) {
+        return nickname != null ? cardManager.manager.nickname.eq(nickname) : null;
     }
 }
