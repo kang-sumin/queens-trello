@@ -1,6 +1,6 @@
 package com.practice.queenstrello.domain.notify.service;
 
-import com.practice.queenstrello.config.Color;
+import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.entity.Comment;
