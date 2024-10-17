@@ -24,7 +24,7 @@ public class BoardListController {
         return ResponseEntity.ok(boardListSaveResponse);
     }
 
-    @PutMapping("/{listId}")
+    @PutMapping("/boards/{boardId}/lists/{listId}")
     public ResponseEntity<BoardListSaveResponse> updateBoardList(
             @PathVariable Long boardListId,
             @AuthenticationPrincipal AuthUser authUser,
@@ -35,7 +35,7 @@ public class BoardListController {
         return ResponseEntity.ok(boardListResponse);
     }
 
-    @DeleteMapping("/{listId}")
+    @DeleteMapping("/boards/{boardId}/lists/{listId}")
     public void deleteBoardList(
             @PathVariable Long boardListId,
             @AuthenticationPrincipal AuthUser authUser,
@@ -44,7 +44,7 @@ public class BoardListController {
         boardListService.deleteBoardList(boardListId, authUser, boardId);
     }
     //특정 위치에 새로운 보드리스트 삽입
-    @PostMapping("/insert")
+    @PostMapping("/boards/{boardId}/lists/insert")
     public ResponseEntity<String> insertBoardListOrder(
             @PathVariable Long boardId,
             @RequestParam Integer targetOrder,
@@ -56,7 +56,7 @@ public class BoardListController {
     }
 
     //기존 보드리스트의 순서변경
-    @PutMapping("/{listId}/order")
+    @PutMapping("/boards/{boardId}/lists/insert/{listId}/order")
     public ResponseEntity<String> changeBoardListOrder(
             @PathVariable Long boardId,
             @PathVariable Long listId,
