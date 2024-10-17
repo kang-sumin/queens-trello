@@ -42,5 +42,6 @@ public class Card {
     @JoinColumn(name="list_id", nullable = false)
     private BoardList boardList;
 
-    private String fileUrl; // 파일 URL 추가
+    @ElementCollection
+    private List<String> fileUrls = new ArrayList<>(); // 여러 파일 URL을 저장
 }

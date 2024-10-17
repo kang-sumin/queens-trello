@@ -1,6 +1,7 @@
 package com.practice.queenstrello.domain.common.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
@@ -20,6 +21,11 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    /**
+     * 메서드에 대한 설명
+     * @param multipartFile //파라미터에 대한 설명
+     * @return 리턴에 대한 설명
+     */
     public String uploadFile(MultipartFile multipartFile) {
         try {
             String fileName = multipartFile.getOriginalFilename();
@@ -31,8 +37,8 @@ public class S3Service {
             // ACL 설정 없이 파일을 업로드
             amazonS3Client.putObject(
                     new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
+                            .withCannedAcl(CannedAccessControlList.PublicRead)
             );
-
             // 업로드한 파일의 URL 반환
             return amazonS3Client.getUrl(bucket, fileName).toString();
         } catch (IOException e) {

@@ -15,16 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class AttachmentsService {
 
-    private final CardRepository cardRepository;
-
     private final S3Service s3Service;
 
     public String uploadAttachmentLinkToCard(MultipartFile file) {
 
         // S3에 파일 업로드 후 URL 반환
         return s3Service.uploadFile(file);
-
-
     }
 }
 

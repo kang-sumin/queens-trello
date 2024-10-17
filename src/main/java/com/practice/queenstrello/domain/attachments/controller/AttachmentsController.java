@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@RequestMapping("/api/attachments")
+@RequestMapping
 public class AttachmentsController {
 
     private final AttachmentsService attachmentsService;
@@ -18,7 +18,7 @@ public class AttachmentsController {
     }
 
     // 첨부파일 업로드
-    @PutMapping("/image")
+    @PutMapping("/attachments/image")
     public ResponseEntity<String> uploadAttachment(
             @RequestPart("file") MultipartFile file) { // 파일 첨부
 
