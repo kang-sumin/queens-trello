@@ -49,7 +49,7 @@ public class BoardListService{
 
         //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
         if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
-            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_WRITE);
         }
 
         BoardList boardList = new BoardList(
@@ -77,7 +77,7 @@ public class BoardListService{
 
         //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
         if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
-            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_WRITE);
         }
 
         BoardList boardList = boardListRepository.findById(boardListId)
@@ -110,7 +110,7 @@ public class BoardListService{
 
         //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
         if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
-            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
+            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_WRITE);
         }
         //삭제할 보드 리스트 조회
         BoardList boardList = boardListRepository.findById(boardListId)

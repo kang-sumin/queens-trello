@@ -36,6 +36,10 @@ public class BoardService {
         User user = User.fromAuthUser(authUser);
         //리스트를 추가할 보드가 존재하는지 확인
         //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
+
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+
         Board board = boardRepository.findById(workspaceId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
 
@@ -46,16 +50,6 @@ public class BoardService {
 
         //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
         if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
-            throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
-        }
-
-        Workspace workspace = workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
-
-        //메서드로 묶고 public 처리
-        //Global Exception 처리
-        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(user.getId(), workspaceId, MemberRole.READ);
-        if (isReadOnly) {
             throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_CREATE);
         }
 
@@ -75,7 +69,7 @@ public class BoardService {
     public BoardSaveResponse getBoard(long boardId, User user) {
         Board newBoard = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
-        //워크 스페이스 유저의 권한 확인
+        //워크 스페이스 멤버인지 여부 확인
         WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), newBoard.getWorkspace().getId())
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
 
@@ -98,21 +92,24 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponse updateBoard(long boardId, BoardUpdateRequest boardRequest, User user) {
+    public BoardSaveResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest, User user, Long workspaceId) {
+        //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
+
+        //워크스페이스의 아이디와 현재 접속해있는 사용자 아이디로 현재 사용자의 워크스페이스 멤버 권한을 확인할수있다
+        //보드가 존재하면 해당 보드가 속해있는 워크스페이스의 아이디 값을 받아와서 그 아이디로 멤버가 멤버의 역할을 조회할수있음
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), workspaceId)
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
+
+        //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
+        if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
+            throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_CREATE);
+        }
         Board newBoard = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
 
-        //워크스페이스에서 유저권한 확인
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), newBoard.getWorkspace().getId())
-                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
-
         if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
-            throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_UPDATE);
-        }
-        boolean isReadOnly = workspaceMemberRepository.existsByMemberIdAndWorkspaceIdAndMemberRole(
-                user.getId(), newBoard.getWorkspace().getId(), MemberRole.READ);
-
-        if (isReadOnly) {
             throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_UPDATE);
         }
         if (boardRequest.getBackgroundColor() != null) {
@@ -128,15 +125,21 @@ public class BoardService {
 
 
     @Transactional
-    public void deleteBoard(long boardId, User user) {
+    public void deleteBoard(long boardId, User user, AuthUser authUser) {
+        User.fromAuthUser(authUser);
+        //리스트를 추가할 보드가 존재하는지 확인
+        //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
 
-        WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), board.getWorkspace().getId())
-                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
+        //워크스페이스의 아이디와 현재 접속해있는 사용자 아이디로 현재 사용자의 워크스페이스 멤버 권한을 확인할수있다
+        //보드가 존재하면 해당 보드가 속해있는 워크스페이스의 아이디 값을 받아와서 그 아이디로 멤버가 멤버의 역할을 조회할수있음
+        WorkspaceMember workspaceMember = workspaceMemberRepository.findByMemberIdAndWorkspaceId(user.getId(), boardId)
+                .orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_MEMBER_NOT_FOUND));
 
-        if (user == null) {
-            throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_DELETE);
+        //워크스페이스 멤버 권한이 READ가 아니면 다 할수있으므로 권한이 READ인것만 예외처리
+        if (workspaceMember.getMemberRole().equals(MemberRole.READ)) {
+            throw new QueensTrelloException(ErrorCode.INVALID_AUTHORITY_CREATE);
         }
 
         boardRepository.delete(board);
