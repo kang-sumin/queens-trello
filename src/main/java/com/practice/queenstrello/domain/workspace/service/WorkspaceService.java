@@ -133,12 +133,10 @@ public class WorkspaceService {
 
         User user = User.fromAuthUser(authUser);
 
-        /**
-         * 현재 로그인된 사용자의 ID로 등록된 WorspaceID 검색
-         * 사용자 ID로 생성된 워크스페이스 + 사용자 ID로 멤버로써 가입된 워크스페이스
-          */
-        List<Long> workspaceIds = workspaceMemberRepository.findWorkspaceIdByUserId(user.getId())
-                .orElseThrow(()-> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
+        // 현재 로그인된 사용자의 ID로 등록된 WorspaceID 검색
+        List<Long> workspaceIds = workspaceMemberRepository.findWorkspaceIdByMemberId(user.getId())
+                .filter(list -> !list.isEmpty())    // 리스트가 비어있는지 확인
+                .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
 
         Page<Workspace> workspaces = workspaceRepository.findByWorkspaceId(workspaceIds, pageable);
 
