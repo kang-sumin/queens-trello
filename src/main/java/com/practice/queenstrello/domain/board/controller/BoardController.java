@@ -29,17 +29,17 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<BoardSaveResponse> getBoard(@PathVariable long boardId, @RequestAttribute("user") User user) {
-        BoardSaveResponse boardSaveResponse = boardService.getBoard(boardId, user);
+    public ResponseEntity<BoardSaveResponse> getBoard(@PathVariable long boardId, @AuthenticationPrincipal AuthUser authUser) {
+        BoardSaveResponse boardSaveResponse = boardService.getBoard(boardId, authUser);
         return ResponseEntity.ok(boardSaveResponse);
     }
 
     @GetMapping
     public ResponseEntity<List<BoardSaveResponse>> getBoards(
-            @RequestParam Long workspaceId,// 워크스페이스 ID를 요청 파라미터로 받음
-            @RequestAttribute("user") User user
+            @PathVariable Long workspaceId,// 워크스페이스 ID를 요청 파라미터로 받음
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        List<BoardSaveResponse> boardResponseList = boardService.getBoards(workspaceId, user);
+        List<BoardSaveResponse> boardResponseList = boardService.getBoards(workspaceId, authUser);
         return ResponseEntity.ok(boardResponseList);
     }
 
@@ -62,12 +62,11 @@ public class BoardController {
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deleteBoard(
-            @PathVariable long boardId,
-            @RequestAttribute("user") User user,// 로그인한 사용자 정보
+            @PathVariable long boardId,// 로그인한 사용자 정보
             @AuthenticationPrincipal AuthUser authUser
     ) {
         try {
-            boardService.deleteBoard(boardId, user, authUser);
+            boardService.deleteBoard(boardId, authUser);
             return ResponseEntity.noContent().build();
         } catch (QueensTrelloException Q) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
