@@ -33,7 +33,7 @@ public class BoardListService {
     private final WorkspaceMemberRepository workspaceMemberRepository;
 
     // 리스트 생성
-    public BoardListSaveResponse savedBoardList(BoardListSaveRequest boardListSaveRequest, AuthUser authUser, Long boardId) {
+    public BoardListSaveResponse  savedBoardList(BoardListSaveRequest boardListSaveRequest, AuthUser authUser, Long boardId) {
 
         //현재 로그인 한 사용자 정보 가져오고 그 사용자의 권한(ADMIN, MASTER, USER)확인 User객체로서 받아온다.
         User user = User.fromAuthUser(authUser);
@@ -138,26 +138,6 @@ public class BoardListService {
         boardListRepository.saveAll(listsToUpdate);
     }
 
-//    //특정 위치에 새로운 리스트 삽입
-//    @Transactional
-//    public void insertBoardList(Long boardId, BoardList newBoardList, Integer targetOrder) {
-//        // 순서가 targetOrder 이상인 boardList 가져오기
-//        List<BoardList> listsToUpdate = boardListRepository.findByBoardIdAndOrderGreaterThanEqual(boardId, targetOrder);
-//
-//        // order값 하나씩 증가시키기
-//        for (BoardList list : listsToUpdate) {
-//            list.setOrder(list.getOrder() + 1);
-//        }
-//        // 변경된 리스트들을 저장합니다.
-//        boardListRepository.saveAll(listsToUpdate);
-//
-//        // 새로운 BoardList의 order 설정 및 저장
-//        newBoardList.setOrder(targetOrder);
-//        // Board 객체 설정 필요 시 추가
-//        // newBoardList.setBoard(board);
-//        boardListRepository.save(newBoardList);
-//    }
-
     //기존 리스트의 순서변경
     @Transactional
     public void changeBoardListOrder(Long boardId, Long boardListId, Integer newOrder, AuthUser authUser) {
@@ -204,11 +184,5 @@ public class BoardListService {
     }
 }
 
-
-//쓰기 권한 검증 -> 다 필요!
-//private void validateWritePermission(WorkspaceMember member) {
-//    if (member.getMemberRole() == MemberRole.READ) {
-//      throw new QueensTrelloException(ErrorCode.HAS_NOT_ACCESS_PERMISSION_READ);
-//    }
 
 

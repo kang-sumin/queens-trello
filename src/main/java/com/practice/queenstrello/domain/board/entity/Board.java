@@ -75,21 +75,4 @@ public class Board extends ModifiedTimestamped {
             this.imageUrl = imageUrl;
         }
     }
-
-    public void updateBoard(String title, String backgroundColor, String imageUrl) {
-        changeTitle(title);
-        changeBackgroundColor(backgroundColor);
-        changeImageUrl(imageUrl);
-    }
-
-    public void addBoardList(BoardList boardList) {
-        boardLists.add(boardList);
-        boardList.setBoard(this);
-    }
-
-    public void removeBoardList(BoardList boardList) {
-        boardLists.remove(boardList);
-        boardList.setBoard(null);
-    }
-
 }
