@@ -10,8 +10,7 @@ import com.practice.queenstrello.domain.comment.entity.Comment;
 import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
-import com.practice.queenstrello.domain.user.entity.User;
-import com.practice.queenstrello.domain.user.entity.UserRole;
+import com.practice.queenstrello.domain.common.aop.annotation.SlackComment;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceMemberRepository;
@@ -30,6 +29,7 @@ public class CommentService {
 
     //댓글 작성
     @Transactional
+    @SlackComment
     public CommentSaveResponse saveComment(CommentSaveRequest commentSaveRequest , Long cardId, Long userId, Long workspaceId) {
 
         //댓글 작성자 확인 - 워크스페이스 멤버 여부 확인
@@ -51,10 +51,16 @@ public class CommentService {
         Comment comment = new Comment(commentSaveRequest.getContent(), card, userRepository.findById(userId).orElseThrow(()-> new QueensTrelloException(ErrorCode.INVALID_USER)));
         commentRepository.save(comment);
 
-        return new CommentSaveResponse(comment.getId(),
-                comment.getContent(),
-                comment.getId(),
-                comment.getCreatedAt());
+        CommentSaveResponse a = null;
+        try {
+            a = new CommentSaveResponse(comment.getId(),
+                    comment.getContent(),
+                    comment.getId(),
+                    comment.getCreatedAt());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return a;
 
     }
 

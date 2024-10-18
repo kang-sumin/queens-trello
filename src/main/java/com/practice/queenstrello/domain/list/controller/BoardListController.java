@@ -4,7 +4,6 @@ import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.list.dto.request.BoardListSaveRequest;
 import com.practice.queenstrello.domain.list.dto.request.BoardListUpdateRequest;
 import com.practice.queenstrello.domain.list.dto.response.BoardListSaveResponse;
-import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.service.BoardListService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +17,7 @@ public class BoardListController {
 
     private final BoardListService boardListService;
 
-    // 리스트 생성
+    // 리스트 생성 - 리스트에 가장 마지막에 추가하는 방식 맨마지막에 추가되도록 구현
     @PostMapping("/boards/{boardId}/lists")
     public ResponseEntity<BoardListSaveResponse> savedBoardList (@RequestBody BoardListSaveRequest boardListSaveRequest, @AuthenticationPrincipal AuthUser authUser, @PathVariable("boardId") Long boardId) {
         BoardListSaveResponse boardListSaveResponse =  boardListService.savedBoardList(boardListSaveRequest, authUser, boardId);
@@ -46,18 +45,6 @@ public class BoardListController {
     ) {
         boardListService.deleteBoardList(boardListId, authUser, boardId);
     }
-
-//    //특정 위치에 새로운 리스트 삽입
-//    @PostMapping("/boards/{boardId}/lists/insert")
-//    public ResponseEntity<String> insertBoardListOrder(
-//            @PathVariable Long boardId,
-//            @RequestParam Integer targetOrder,
-//            @RequestBody BoardList boardList,
-//            @AuthenticationPrincipal AuthUser authUser
-//            ) {
-//        boardListService.insertBoardList(boardId, boardList, targetOrder);
-//        return ResponseEntity.ok("BoardList inserted successfully at order " + targetOrder + ".");
-//    }
 
     //기존 리스트의 순서변경
     @PutMapping("/boards/{boardId}/lists/insert/{listId}/order")

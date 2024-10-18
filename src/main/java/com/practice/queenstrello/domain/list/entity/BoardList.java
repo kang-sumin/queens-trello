@@ -52,10 +52,5 @@ public class BoardList {
         cards.add(card);
         card.setBoardList(this); //양방향 연관관계 설정
     }
-    //리스트 카드 제거 메서드
-    public void removeCard(Card card) {
-        cards.remove(card);
-        card.setBoardList(null); //양방향 연관관계 해제
-    }
 
 }

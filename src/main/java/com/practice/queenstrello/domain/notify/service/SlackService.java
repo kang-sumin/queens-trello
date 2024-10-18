@@ -1,7 +1,5 @@
 package com.practice.queenstrello.domain.notify.service;
 
-import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
-import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.card.entity.Card;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.entity.Comment;
@@ -9,6 +7,7 @@ import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.notify.entity.Classification;
+import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
@@ -46,10 +45,6 @@ public class SlackService {
     private final CommentRepository commentRepository;
 
     private final Slack slackClient = Slack.getInstance();
-
-    @SlackMaster
-    public void test() {}
-
 
     /**
      * 슬랙 메시지 전송 메서드
@@ -145,14 +140,15 @@ public class SlackService {
         log.info("["+ classification +"] ::: To."+receiver.getId()+" ::: of.Workspace : "+workspace.getName());
     }
 
-    public void changeCard(Long userId, Long cardId) {
+    public void changeCard(Long userId, Long workspaceId, Long cardId) {
         User receiver = findUser(userId);
+        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(()->new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
         //card의 매니저인지 확인
         checkManager(card, receiver);
         String slackUrl = receiver.getSlackUrl();
         Classification classification = Classification.Card;
-        String title = classification.getTitle();
+        String title = workspace.getName()+" 워크스페이스에서 "+classification.getTitle();
         String message = card.getTitle()+" 카드 내용을 꼼꼼히 확인하세요!";
         sendMessage(classification, slackUrl, title, message,null,card.getTitle(),card.getContent());
         log.info("["+ classification +"] ::: To."+receiver.getId()+" ::: of.Card : "+card.getId());
