@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,4 +27,5 @@ public class UserController {
         userService.deleteUser(authUser.getUserId(), deletionRequest.getPassword());
         return ResponseEntity.ok("회원탈퇴가 완료되었습니다.");
     }
+
 }

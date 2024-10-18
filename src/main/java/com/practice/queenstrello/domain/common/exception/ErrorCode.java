@@ -16,7 +16,10 @@ public enum ErrorCode {
     USER_HAS_NOT_PERMISSION(HttpStatus.FORBIDDEN, "권한이 없습니다."),
 
     // Attachment ErrorCode
-
+    ATTACHMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "첨부파일을 찾을 수 없습니다."),
+    FILE_EMPTY(HttpStatus.BAD_REQUEST, "업로드할 파일이 없습니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "파일을 업로드 할 . 없습니다."),
+    CARD_NOT_FOUND(HttpStatus.NOT_FOUND, "카드를 찾을 수 없습니다."),
 
     // MemberRole Errorcode
     MEMBER_ALREADY_EXIST(HttpStatus.CONFLICT, "이미 멤버로 초대되어 있는 유저입니다."),
@@ -63,6 +66,9 @@ public enum ErrorCode {
 
     // Notification Errorcode
 
+    // S3service Errorcode
+    FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드 에러입니다."),
+    FILE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제 에러입니다."),
 
     // ### 아래 코드 위에 ErrorCode 작성해 주세요! ErrorCode 메서드 사이는 ,(컴마)로 구분해 주세요! ###
     NOT_FOUND(HttpStatus.NOT_FOUND, "찾지못했습니다.");

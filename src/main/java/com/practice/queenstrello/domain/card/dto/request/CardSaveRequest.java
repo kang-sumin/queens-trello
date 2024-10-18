@@ -17,5 +17,5 @@ public class CardSaveRequest {
     private String content;
     private LocalDateTime deadLine;
     private List<Long> managerIds;
-
+    private List<String> attachments;
 }
