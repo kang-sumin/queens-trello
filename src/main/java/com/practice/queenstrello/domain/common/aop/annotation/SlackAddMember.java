@@ -1,4 +1,4 @@
-package com.practice.queenstrello.domain.notify.annotation;
+package com.practice.queenstrello.domain.common.aop.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,5 +7,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SlackInvite {
+public @interface SlackAddMember {
 }

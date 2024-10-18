@@ -41,19 +41,19 @@ public class AspectPractice {
     private final CommentRepository commentRepository;
 
 
-    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackMaster)")
+    @Pointcut("@annotation(com.practice.queenstrello.domain.common.aop.annotation.SlackMaster)")
     private void slackMasterAnnotation() {}
 
-    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackInvite)")
+    @Pointcut("@annotation(com.practice.queenstrello.domain.common.aop.annotation.SlackInvite)")
     private void slackInviteAnnotation() {}
 
-    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackAddMember)")
+    @Pointcut("@annotation(com.practice.queenstrello.domain.common.aop.annotation.SlackAddMember)")
     private void slackMemberAnnotation() {}
 
-    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackCard)")
+    @Pointcut("@annotation(com.practice.queenstrello.domain.common.aop.annotation.SlackCard)")
     private void slackCardAnnotation() {}
 
-    @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackComment)")
+    @Pointcut("@annotation(com.practice.queenstrello.domain.common.aop.annotation.SlackComment)")
     private void slackCommentAnnotation() {}
 
     //마스터 승급시 알림

@@ -1,9 +1,8 @@
 package com.practice.queenstrello.domain.workspace.service;
 
-import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
-import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
+import com.practice.queenstrello.domain.common.aop.annotation.SlackMaster;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
