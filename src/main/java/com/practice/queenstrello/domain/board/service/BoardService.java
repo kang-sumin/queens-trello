@@ -63,7 +63,8 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponse getBoard(long boardId, User user) {
+    public BoardSaveResponse getBoard(long boardId, AuthUser authUser) {
+        User user = User.fromAuthUser(authUser);
         Board newBoard = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
         //워크 스페이스 멤버인지 여부 확인
@@ -74,7 +75,8 @@ public class BoardService {
     }
 
     @Transactional
-    public List<BoardSaveResponse> getBoards(Long workspaceId, User user) {
+    public List<BoardSaveResponse> getBoards(Long workspaceId, AuthUser authUser) {
+        User user = User.fromAuthUser(authUser);
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
 
@@ -89,7 +91,8 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest, User user, Long workspaceId) {
+    public BoardSaveResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest, AuthUser authUser, Long workspaceId) {
+        User user = User.fromAuthUser(authUser);
         //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
@@ -122,8 +125,8 @@ public class BoardService {
 
 
     @Transactional
-    public void deleteBoard(long boardId, User user, AuthUser authUser) {
-        User.fromAuthUser(authUser);
+    public void deleteBoard(long boardId,AuthUser authUser) {
+        User user = User.fromAuthUser(authUser);
         //리스트를 추가할 보드가 존재하는지 확인
         //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
         Board board = boardRepository.findById(boardId)
