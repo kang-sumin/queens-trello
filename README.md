@@ -51,7 +51,7 @@
 > **ERD 구조 다이어그램**  
 > Queens-Trello의 핵심 데이터베이스 구조를 나타내는 ERD입니다. 각 테이블 간의 관계와 주요 엔티티를 시각적으로 표현했습니다.
 https://www.erdcloud.com/d/JbLaBRMmuBZvm6wye
-<img width="1293" alt="Queens-Trello 2024-10-18 오전 1 57 14" src="https://github.com/user-attachments/assets/d4339591-d49d-4257-ae99-998f59bcf29a">
+> <img width="1293" alt="Queens-Trello 2024-10-18 오전 1 57 14" src="https://github.com/user-attachments/assets/53c3424d-239c-441a-80f8-f67fcd6f574c">
 
 
 ---
