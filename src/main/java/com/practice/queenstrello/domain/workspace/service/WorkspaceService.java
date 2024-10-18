@@ -94,7 +94,7 @@ public class WorkspaceService {
                 .orElseThrow(() -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
         // 이미 해당 멤버가 초대되어 있는지 예외 처리
-        if(!(workspaceMemberRepository.existsByMemberIdAndWorkspaceId(inviteMember.getId(), workspace.getId()))) {
+        if(workspaceMemberRepository.existsByMemberIdAndWorkspaceId(inviteMember.getId(), workspace.getId())) {
             throw new QueensTrelloException(ErrorCode.MEMBER_ALREADY_EXIST);
         }
 
