@@ -14,12 +14,15 @@ public class CardDetailResponse {
     private final LocalDateTime deadLine;
     private final List<Long> managerIds;
     private final List<CommentSaveResponse> comments;
+    private List<FileUrlResponse> attachments;
 
-    public CardDetailResponse(String title, String content, LocalDateTime deadLine, List<Long> managerIds, List<CommentSaveResponse> comments) {
+
+    public CardDetailResponse(String title, String content, LocalDateTime deadLine, List<Long> managerIds, List<CommentSaveResponse> comments,  List<FileUrlResponse> attachments) {
         this.title = title;
         this.content = content;
         this.deadLine = deadLine;
         this.managerIds = managerIds;
         this.comments = comments;
+        this.attachments = attachments;
     }
 }

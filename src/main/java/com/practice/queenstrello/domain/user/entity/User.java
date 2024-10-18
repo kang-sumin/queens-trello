@@ -35,9 +35,6 @@ public class User extends CreatedTimestamped {
     @Column(name="user_nickname", nullable = false, length = 50)
     private String nickname;
 
-    @Column(name="user_slack_url", length = 100)
-    private String slackUrl;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private UserRole userRole;
@@ -45,13 +42,16 @@ public class User extends CreatedTimestamped {
     @Column(name="is_deleted",nullable=false)
     private Boolean isDeleted = Boolean.FALSE;
 
+    @Column(name="user_slack_url", nullable = false, length = 100)
+    private String slackUrl;
 
 
-    public User(@NotBlank @Email String email, String encodedPassword, @NotBlank String nickname, UserRole userRole) {
+    public User(@NotBlank @Email String email, String encodedPassword, @NotBlank String nickname, UserRole userRole, String slackUrl) {
         this.email = email;
         this.password = encodedPassword;
         this.nickname = nickname;
         this.userRole = userRole;
+        this.slackUrl = slackUrl;
     }
 
     // Service 로직에서 UserRepository를 주입받지 User객체를 생성하지 않고 인증된 AuthUser로 User 객체를 받아오기 위해서 사용
@@ -75,5 +75,4 @@ public class User extends CreatedTimestamped {
     public void updateRole(UserRole userRole) {
         this.userRole = userRole;
     }
-
 }

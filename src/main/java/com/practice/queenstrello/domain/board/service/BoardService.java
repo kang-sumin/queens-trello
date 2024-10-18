@@ -8,6 +8,7 @@ import com.practice.queenstrello.domain.board.entity.Board;
 import com.practice.queenstrello.domain.board.repository.BoardRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.common.service.S3Service;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.entity.Workspace;
@@ -29,6 +30,7 @@ public class BoardService {
     private final BoardRepository boardRepository;
     private final WorkspaceRepository workspaceRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final S3Service s3Service;
 
     @Transactional
     public BoardSaveResponse savedBoard(Long workspaceId, BoardSaveRequest boardSaveRequest, AuthUser authUser) {
@@ -117,6 +119,7 @@ public class BoardService {
         }
         if (boardRequest.getImageUrl() != null) {
             newBoard.changeImageUrl(boardRequest.getImageUrl());
+            s3Service.deleteFile(board.getImageUrl()); //기존의 Url 더이상 참조안하면 버린다.
         }
 
         Board updateBoard = boardRepository.save(newBoard); //수정 후 저장
@@ -144,4 +147,5 @@ public class BoardService {
 
         boardRepository.delete(board);
     }
+
 }

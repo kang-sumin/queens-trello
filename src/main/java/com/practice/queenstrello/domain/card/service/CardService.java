@@ -2,18 +2,18 @@ package com.practice.queenstrello.domain.card.service;
 
 import com.practice.queenstrello.domain.card.dto.request.CardSaveRequest;
 import com.practice.queenstrello.domain.card.dto.request.CardUpdateRequest;
-import com.practice.queenstrello.domain.card.dto.response.CardDetailResponse;
-import com.practice.queenstrello.domain.card.dto.response.CardSaveResponse;
-import com.practice.queenstrello.domain.card.dto.response.CardSimpleResponse;
-import com.practice.queenstrello.domain.card.dto.response.CardUpdateResponse;
+import com.practice.queenstrello.domain.card.dto.response.*;
 import com.practice.queenstrello.domain.card.entity.Card;
+import com.practice.queenstrello.domain.card.entity.CardAttachments;
 import com.practice.queenstrello.domain.card.entity.CardManager;
+import com.practice.queenstrello.domain.card.repository.CardAttachmentsRepository;
 import com.practice.queenstrello.domain.card.repository.CardManagerRepository;
 import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.comment.dto.response.CommentSaveResponse;
 import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.common.service.S3Service;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
 import com.practice.queenstrello.domain.common.aop.annotation.SlackCard;
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +49,8 @@ public class CardService {
     private final BoardListRepository boardListRepository;
     private final CommentRepository commentRepository;
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final S3Service s3Service;
+    private final CardAttachmentsRepository cardAttachmentsRepository;
 
     //카드 생성
     @Transactional
@@ -91,12 +94,25 @@ public class CardService {
         List<Long> managerIds = managers.stream()
                 .map(User::getId)
                 .toList();
+        //첨부파일 리스트 생성
+        List<CardAttachments> attachments = new ArrayList<>();
+        for(String url : cardSaveRequest.getAttachments()) {
+            attachments.add(new CardAttachments(url, card));
+        }
+        //첨부파일 저장
+        cardAttachmentsRepository.saveAll(attachments);
+        //첨부파일 URL 리스트 반환
+        List<String> fileUrl = attachments.stream()
+                .map(CardAttachments::getFileUrl)
+                .toList();
 
         return new CardSaveResponse(card.getId(),
                 card.getTitle(),
                 card.getContent(),
                 card.getDeadLine(),
-                managerIds);
+                managerIds,
+                fileUrl
+                );
     }
 
     //카드 다건 조회
@@ -132,6 +148,10 @@ public class CardService {
         //카드정보 조회
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException((ErrorCode.INVALID_CARD)));
 
+        List<FileUrlResponse> fileUrlResponses = new ArrayList<>();
+        for (CardAttachments attachment : card.getCardAttachments()) {
+            fileUrlResponses.add(new FileUrlResponse(attachment.getFileUrl()));
+        }
         //카드 정보와 담당자 목록 리스폰스하기 + 댓글도 -> +첨부파일
         return new CardDetailResponse(
                 card.getTitle(),
@@ -142,7 +162,9 @@ public class CardService {
                         .toList(),
                 card.getComments().stream()
                         .map(comment -> new CommentSaveResponse(comment.getId(), comment.getContent(), comment.getUser().getId(), comment.getCreatedAt()))
-                        .toList()
+                        .toList(),
+                fileUrlResponses
+
         ); //of 나 builder 쓰면 간결해짐
     }
 
@@ -287,7 +309,10 @@ public class CardService {
                     //로그 저장 중 예외 발생해도, 로그만 별도 트랜잭션으로 구현했으니 수정과 별개로 처리해야한다.
                     log.error("로그 저장 중 에러가 발생했습니다.");
                 }
-
+                //파일 삭제
+                for(CardAttachments cardAttachments:card.getCardAttachments()){
+                    s3Service.deleteFile(cardAttachments.getFileUrl());
+                }
                 //카드 삭제
                 cardRepository.delete(card);
 

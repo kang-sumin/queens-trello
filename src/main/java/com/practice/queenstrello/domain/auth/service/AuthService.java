@@ -11,6 +11,7 @@ import com.practice.queenstrello.domain.user.entity.UserRole;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,40 +25,40 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public AuthSignupResponse signup(@Valid AuthSignupRequest authSignupRequest) {
+    public ResponseEntity<AuthSignupResponse> signup(@Valid AuthSignupRequest authSignupRequest) {
         if (userRepository.existsByEmail(authSignupRequest.getEmail())) {
             throw new QueensTrelloException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         String encodedPassword = passwordEncoder.encode(authSignupRequest.getPassword());
-
         UserRole userRole = UserRole.of(authSignupRequest.getUserRole());
 
         User newUser = new User(
                 authSignupRequest.getEmail(),
                 encodedPassword,
                 authSignupRequest.getNickname(),
-                userRole
+                userRole,
+                authSignupRequest.getSlackUrl()
         );
         User savedUser = userRepository.save(newUser);
 
-        String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole,  savedUser.getNickname());
+        String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole, savedUser.getNickname());
 
-        return new AuthSignupResponse(bearerToken);
-
+        return ResponseEntity.ok(new AuthSignupResponse(bearerToken));
     }
+
     // 로그인
-    public AuthSigninResponse signin(AuthSigninRequest authSigninRequest) {
+    public ResponseEntity<AuthSigninResponse> signin(AuthSigninRequest authSigninRequest) {
         User user = userRepository.findByEmail(authSigninRequest.getEmail()).orElseThrow(
                 () -> new QueensTrelloException(ErrorCode.USER_NOT_FOUND));
 
-        // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환
+        // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우
         if (!passwordEncoder.matches(authSigninRequest.getPassword(), user.getPassword())) {
             throw new QueensTrelloException(ErrorCode.INVALID_PASSWORD);
         }
 
         String bearerToken = jwtUtil.createToken(user.getId(), user.getEmail(), user.getUserRole(), user.getNickname());
 
-        return new AuthSigninResponse(bearerToken);
+        return ResponseEntity.ok(new AuthSigninResponse(bearerToken));
     }
 }

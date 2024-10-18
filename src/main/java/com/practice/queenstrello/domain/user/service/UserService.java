@@ -1,14 +1,17 @@
 package com.practice.queenstrello.domain.user.service;
 
 
+import com.practice.queenstrello.domain.auth.AuthUser;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
+import com.practice.queenstrello.domain.common.service.S3Service;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final S3Service s3Service;
 
     @Transactional
     public void deleteUser(Long userId, String password) {
@@ -30,8 +34,8 @@ public class UserService {
         }
 
         // 논리적 삭제 처리 (isDeleted를 true로 설정)
-        user.setIsDeleted(true);
-        // 사용자 정보를 업데이트
+        user.setIsDeleted(true);//메서드명 변경
+        // 사용자 정보 저장
         userRepository.save(user);
 
 }

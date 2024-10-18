@@ -40,6 +40,10 @@ public class Card extends CreatedTimestamped {
     @OneToMany(mappedBy = "card",cascade = CascadeType.REMOVE)
     private List<CardManager> cardManagers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "card",cascade = CascadeType.REMOVE)
+    private List<CardAttachments> cardAttachments = new ArrayList<>();
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="list_id", nullable = false)
     private BoardList boardList;
@@ -66,5 +70,9 @@ public class Card extends CreatedTimestamped {
         this.content=content;
         this.deadLine=deadLine;
     }
+
+    //public void addCardAttachments(CardAttachments cardAttachments){
+        //this.cardAttachments.add(cardAttachments);
+ //   }
 
 }
