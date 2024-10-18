@@ -6,7 +6,6 @@ import com.practice.queenstrello.domain.comment.entity.Comment;
 import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
-import com.practice.queenstrello.domain.notify.annotation.SlackMaster;
 import com.practice.queenstrello.domain.notify.entity.Classification;
 import com.practice.queenstrello.domain.notify.entity.Color;
 import com.practice.queenstrello.domain.user.entity.User;

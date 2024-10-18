@@ -16,7 +16,7 @@ import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
-import com.practice.queenstrello.domain.notify.annotation.SlackCard;
+import com.practice.queenstrello.domain.common.aop.annotation.SlackCard;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;

@@ -10,7 +10,7 @@ import com.practice.queenstrello.domain.comment.entity.Comment;
 import com.practice.queenstrello.domain.comment.repository.CommentRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
-import com.practice.queenstrello.domain.notify.annotation.SlackComment;
+import com.practice.queenstrello.domain.common.aop.annotation.SlackComment;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
 import com.practice.queenstrello.domain.workspace.repository.WorkspaceMemberRepository;
