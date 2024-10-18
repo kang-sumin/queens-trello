@@ -2,7 +2,6 @@ package com.practice.queenstrello.domain.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,10 +20,7 @@ public class GlobalExceptionHandler {
         return getErrorResponse(ex.getErrorCode().getStatus(), ex.getMessage());
     }
 
-    @ExceptionHandler(NoNicnameUserException.class)
-    public ResponseEntity<Map<String, Object>> handlePasswordMismatchException(NoNicnameUserException ex) {
-        return getErrorResponse(ex.getErrorCode().getStatus(), ex.getMessage());
-    }
+
 
     /**
      * @param status : 오류 상태 코드
