@@ -12,12 +12,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name="card_attachments")
 public class CardAttachments {
-//컬럼명
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="card_attachment_id")
     private Long id;
 
+    @Column(name="file_url", nullable=false)
     private String fileUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
