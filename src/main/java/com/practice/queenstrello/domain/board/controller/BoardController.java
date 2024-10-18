@@ -48,11 +48,11 @@ public class BoardController {
     public ResponseEntity<BoardSaveResponse> updateBoard(
             @PathVariable long boardId,
             @RequestBody BoardUpdateRequest boardUpdateRequest,
-            @RequestAttribute("user") User user,// 로그인한 사용자 정보
+            @AuthenticationPrincipal AuthUser authUser,// 로그인한 사용자 정보
             @PathVariable("workspaceId") Long workspaceId
     ) {
         try {
-            BoardSaveResponse boardResponse = boardService.updateBoard(boardId, boardUpdateRequest, user, workspaceId);
+            BoardSaveResponse boardResponse = boardService.updateBoard(boardId, boardUpdateRequest, authUser, workspaceId);
             return ResponseEntity.ok(boardResponse);
         } catch (QueensTrelloException Q) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);

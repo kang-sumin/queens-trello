@@ -89,8 +89,9 @@ public class BoardService {
     }
 
     @Transactional
-    public BoardSaveResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest, User user, Long workspaceId) {
+    public BoardSaveResponse updateBoard(Long boardId, BoardUpdateRequest boardRequest, AuthUser authUser, Long workspaceId) {
         //존재하면 존재한 보드 객체를 검색해서 받아야 하고 없으면 없다는 예외를 발생해야함
+        User user = User.fromAuthUser(authUser);
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(()-> new QueensTrelloException(ErrorCode.BOARD_NOT_FOUND));
 
