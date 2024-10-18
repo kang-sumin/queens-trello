@@ -29,6 +29,7 @@ public class S3Service {
             metadata.setContentLength(multipartFile.getSize());
             metadata.setContentType(multipartFile.getContentType());
 
+
             amazonS3Client.putObject(
                     new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), metadata)
                     // ACL 설정 제거
@@ -40,9 +41,10 @@ public class S3Service {
         }
     }
 
-    public void deleteFile(String fileName) {
+    public void deleteFile(String fileUrl) {
         try {
-            amazonS3Client.deleteObject(bucket, fileName);
+            String[] split = fileUrl.split("/");
+            amazonS3Client.deleteObject(bucket, split[split.length - 1] );
         } catch (Exception e) {
             throw new QueensTrelloException(ErrorCode.FILE_DELETE_ERROR);
         }

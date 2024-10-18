@@ -1,9 +1,5 @@
 package com.practice.queenstrello.domain.attachments.service;
 
-import com.practice.queenstrello.domain.card.entity.Card;
-import com.practice.queenstrello.domain.card.repository.CardRepository;
-import com.practice.queenstrello.domain.common.exception.ErrorCode;
-import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.common.service.S3Service;
 import lombok.RequiredArgsConstructor;
 

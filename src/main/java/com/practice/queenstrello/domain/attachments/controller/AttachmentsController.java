@@ -25,4 +25,5 @@ public class AttachmentsController {
         String fileUrl = attachmentsService.uploadAttachmentLinkToCard(file); //
         return ResponseEntity.status(HttpStatus.CREATED).body(fileUrl);
     }
+
 }
