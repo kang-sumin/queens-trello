@@ -70,10 +70,10 @@ public class SlackController {
      * @param cardId 변경된 카드 ID
      * @return 성공 여부
      */
-    @PostMapping("/card/{userId}/{cardId}")
-    public String changeCard(@PathVariable Long userId, @PathVariable Long cardId) {
+    @PostMapping("/card/{userId}/{workspaceId}/{cardId}")
+    public String changeCard(@PathVariable Long userId, @PathVariable Long cardId, @PathVariable Long workspaceId) {
         try {
-            slackService.changeCard(userId, cardId);
+            slackService.changeCard(userId, workspaceId, cardId );
         } catch (Exception e) {
             e.printStackTrace();
             return "fail";

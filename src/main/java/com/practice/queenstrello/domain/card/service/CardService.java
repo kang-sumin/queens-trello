@@ -16,6 +16,7 @@ import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.list.entity.BoardList;
 import com.practice.queenstrello.domain.list.repository.BoardListRepository;
+import com.practice.queenstrello.domain.notify.annotation.SlackCard;
 import com.practice.queenstrello.domain.user.entity.User;
 import com.practice.queenstrello.domain.user.repository.UserRepository;
 import com.practice.queenstrello.domain.workspace.entity.MemberRole;
@@ -34,8 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.practice.queenstrello.domain.user.entity.QUser.user;
 
 @Slf4j
 @Service
@@ -149,6 +148,7 @@ public class CardService {
 
     //카드 수정 + 동시성 제어
     @Transactional
+    @SlackCard
     public CardUpdateResponse updateCard(Long cardId, CardUpdateRequest cardUpdateRequest, Long userId, Long workspaceId) {
 
         //사용자 확인->로그에 써야함

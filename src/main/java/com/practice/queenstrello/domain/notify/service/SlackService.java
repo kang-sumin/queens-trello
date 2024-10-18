@@ -47,10 +47,6 @@ public class SlackService {
 
     private final Slack slackClient = Slack.getInstance();
 
-    @SlackMaster
-    public void test() {}
-
-
     /**
      * 슬랙 메시지 전송 메서드
      **/
@@ -145,14 +141,15 @@ public class SlackService {
         log.info("["+ classification +"] ::: To."+receiver.getId()+" ::: of.Workspace : "+workspace.getName());
     }
 
-    public void changeCard(Long userId, Long cardId) {
+    public void changeCard(Long userId, Long workspaceId, Long cardId) {
         User receiver = findUser(userId);
+        Workspace workspace = workspaceRepository.findById(workspaceId).orElseThrow(()->new QueensTrelloException(ErrorCode.WORKSPACE_NOT_FOUND));
         Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
         //card의 매니저인지 확인
         checkManager(card, receiver);
         String slackUrl = receiver.getSlackUrl();
         Classification classification = Classification.Card;
-        String title = classification.getTitle();
+        String title = workspace.getName()+" 워크스페이스에서 "+classification.getTitle();
         String message = card.getTitle()+" 카드 내용을 꼼꼼히 확인하세요!";
         sendMessage(classification, slackUrl, title, message,null,card.getTitle(),card.getContent());
         log.info("["+ classification +"] ::: To."+receiver.getId()+" ::: of.Card : "+card.getId());

@@ -1,6 +1,8 @@
 package com.practice.queenstrello.domain.common.aop;
 
 import com.practice.queenstrello.domain.auth.AuthUser;
+import com.practice.queenstrello.domain.card.entity.Card;
+import com.practice.queenstrello.domain.card.repository.CardRepository;
 import com.practice.queenstrello.domain.common.exception.ErrorCode;
 import com.practice.queenstrello.domain.common.exception.QueensTrelloException;
 import com.practice.queenstrello.domain.notify.service.SlackService;
@@ -30,6 +32,7 @@ public class AspectPractice {
     private final SlackService slackService;
     private final UserRepository userRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final CardRepository cardRepository;
 
 
     @Pointcut("@annotation(com.practice.queenstrello.domain.notify.annotation.SlackMaster)")
@@ -93,12 +96,29 @@ public class AspectPractice {
 
     @AfterReturning("slackCardAnnotation()")
     public void slackCard(JoinPoint joinPoint) {
+        try {
+            Long cardId = (Long) joinPoint.getArgs()[0];
+            Long workspaceId = (Long) joinPoint.getArgs()[3];
+            Long userId = (Long) joinPoint.getArgs()[2];
 
+            Card card = cardRepository.findById(cardId).orElseThrow(() -> new QueensTrelloException(ErrorCode.INVALID_CARD));
+            List<User> managers = card.getCardManagers().stream().map(cm -> cm.getManager()).toList();
+            for (User manager : managers) {
+                //자신이 수정한 카드일경우 알림이 안옴
+                if (!Objects.equals(manager.getId(), userId)) {
+                    slackService.changeCard(manager.getId(), workspaceId, cardId);
+                }
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @AfterReturning("slackCommentAnnotation()")
     public void slackComment(JoinPoint joinPoint) {
-
+        Long cardId = (Long) joinPoint.getArgs()[1];
+        Long creatorId = (Long) joinPoint.getArgs()[2];
+        Long workspaceId = (Long) joinPoint.getArgs()[3];
     }
 
 
